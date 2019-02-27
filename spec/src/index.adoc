@@ -1,0 +1,7 @@
+// Include headers in all files to support Atom's Asciidoc Preview plugin.
+:imagesdir: assets
+include::header.adoc[]
+
+= Report Bot Specification
+
+TODO: Write spec.

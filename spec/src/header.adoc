@@ -1,0 +1,25 @@
+// Include headers in all files to support Atom's Asciidoc Preview plugin.
+ifndef::header[]
+:header:
+:toc: left
+:toclevels: 3
+:doctype: book
+:sectlinks:
+:sectanchors:
+:sectnums:
+:linkattrs:
+:icons: font
+:experimental:
+:stem:
+:source-highlighter: highlightjs
+:highlightjsdir: assets/highlight
+// Thin non-breakable space.
+// TODO: Add support for non-HTML outputs.
+:t: pass:[<span style="white-space:nowrap">&thinsp;</span>]
+:commandkey: &#8984;
+:uparrow: ↑
+:downarrow: ↓
+:backspace: ⌫
+:delete: ⌦
+:enter: ↩
+endif::header[]
