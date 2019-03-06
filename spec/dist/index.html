@@ -419,22 +419,104 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
 </head>
-<body class="book">
+<body class="book toc2 toc-left">
 <div id="header">
 <h1>Report Bot Specification</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_data_structure_of_a_report">1. Data Structure of a Report</a></li>
+</ul>
+</div>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>TODO: Write spec.</p>
+<p>Create a simple slack bot that will scrape the content of messages and store
+them in a database.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_data_structure_of_a_report"><a class="anchor" href="#_data_structure_of_a_report"></a><a class="link" href="#_data_structure_of_a_report">1. Data Structure of a Report</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Every message posted in a channel where @ReportBot is present is considered a
+report. Report bot should gather following information about the post and save
+it into Postgres:</p>
+</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+Tags
+</td>
+<td class="hdlist2">
+<p>All emojis present in the message or message threads that begin with <code>@</code>,
+such as <code>:@finance:</code>.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+ts
+</td>
+<td class="hdlist2">
+<p>Message ts when the message was created.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+User
+</td>
+<td class="hdlist2">
+<p>Slack ID of a user who has created the message.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Message
+</td>
+<td class="hdlist2">
+<p>Content of the message.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Permalink
+</td>
+<td class="hdlist2">
+<p>Slack link to the message created using <code>chat.getPermalink</code>.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Channel
+</td>
+<td class="hdlist2">
+<p>ID of the channel the message was posted in.</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+Responses
+</td>
+<td class="hdlist2">
+<p>Other messages in the thread.</p>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Whenever a message changes, update it. @ReportBot should monitor all events
+happening in the channel he is present to and act accordingly.</p>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-27 17:52:59 HKT
+Last updated 2019-03-06 18:37:31 CET
 </div>
 </div>
 <link rel="stylesheet" href="assets/highlight/styles/github.min.css">

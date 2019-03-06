@@ -4,4 +4,30 @@ include::header.adoc[]
 
 = Report Bot Specification
 
-TODO: Write spec.
+Create a simple slack bot that will scrape the content of messages and store
+them in a database.
+
+== Data Structure of a Report
+Every message posted in a channel where @ReportBot is present is considered a
+report. Report bot should gather following information about the post and save
+it into Postgres:
+
+[horizontal]
+Tags:: All emojis present in the message or message threads that begin with `@`,
+such as `:@finance:`.
+
+ts:: Message ts when the message was created.
+
+User:: Slack ID of a user who has created the message.
+
+Message:: Content of the message.
+
+Permalink:: Slack link to the message created using `chat.getPermalink`.
+
+Channel:: ID of the channel the message was posted in.
+
+Responses:: Other messages in the thread.
+
+
+Whenever a message changes, update it. @ReportBot should monitor all events
+happening in the channel he is present to and act accordingly.
