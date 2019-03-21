@@ -9,6 +9,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "dev": "babel-node -- src/index.js",
+    "knex": "knex --knexfile src/knex/knexfile.js",
     "eslint": "eslint src",
     "build": "babel src -d dist",
     "start": "node -- dist/index.js"
@@ -27,6 +28,8 @@
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-export-extensions": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "knex": "^0.16.3",
+    "pg": "^6.2.4",
     "transenv": "^1.0.3"
   }
 }
