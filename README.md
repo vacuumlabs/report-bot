@@ -8,12 +8,18 @@
 $ docker run --name report-bot-db -p 127.0.0.1:5432:5432 -e POSTGRES_DB=report_bot -e POSTGRES_PASSWORD=postgres -d postgres
 ```
 
-  * Create file `.env` in the root directory with the same content as you can find in `.env.sample`.
+  * Create file `.env` in the root directory with the same content as you can find in `.env.sample`. Then set value to variable `SLACK_BOT_TOKEN`.
 
   * Run migrations:
 
 ```bash
 $ yarn knex migrate:latest
+```
+
+  * Run application:
+
+```bash
+$ yarn && yarn bulid && yarn start
 ```
 
 ## Developer notes

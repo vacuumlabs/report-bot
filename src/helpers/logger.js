@@ -1,7 +1,7 @@
 import { createLogger, format, transports } from 'winston'
 import config from '../config'
 
-const logger = createLogger({
+export const logger = createLogger({
   format: format.combine(
     format.colorize(),
     format.splat(),
@@ -12,5 +12,3 @@ const logger = createLogger({
     new transports.Console(),
   ]
 })
-
-export default logger

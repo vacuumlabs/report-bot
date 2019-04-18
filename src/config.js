@@ -20,5 +20,8 @@ export default transenv()(({str, bool, num}) => {
         directory: 'migrations',
       },
     },
+    slack: {
+      botToken: str('SLACK_BOT_TOKEN'),
+    },
   }
 })
