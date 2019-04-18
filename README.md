@@ -22,6 +22,21 @@ $ yarn knex migrate:latest
 $ yarn && yarn bulid && yarn start
 ```
 
+## How to use bot
+
+  * Install bot to your workspace:
+  * Invite bot to some channel you want to scrape its and store them in a database:
+
+```
+/invite @ReportBot 
+```
+
+  * If you want to stop scraping content of some channel you can run command:
+
+```
+/remove @ReportBot 
+```
+
 ## Developer notes
 
   * How to create a new database migration, e.g. for creation of `report` table:
@@ -35,3 +50,10 @@ $ yarn knex migrate:make create_report_table
 ```bash
 $ yarn knex migrate:rollback
 ```
+
+## TODOS:
+
+* write where to get bot token
+* how to install bot
+* what to do on message delete?
+* what to do on message change? change also ts and permalink?
