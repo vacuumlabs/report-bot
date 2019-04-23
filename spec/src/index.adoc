@@ -31,3 +31,7 @@ Responses:: Other messages in the thread.
 
 Whenever a message changes, update it. @ReportBot should monitor all events
 happening in the channel he is present to and act accordingly.
+
+== UI
+UI designs can be found in
+https://projects.invisionapp.com/share/A3QV9T7RF6B#/screens/352239709[invission^].
