@@ -6,6 +6,7 @@ export default transenv()(({str, bool, num}) => {
 
   return {
     env,
+    serverPort: str('SERVER_PORT', 5000),
     logLevel: str('LOG_LEVEL', isDevelopment ? 'debug' : 'error'),
     knex: {
       client: 'pg',

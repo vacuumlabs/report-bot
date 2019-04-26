@@ -1,6 +1,6 @@
 import { RTMClient, WebClient } from '@slack/client'
 
-import { connectSlack, logger } from './helpers'
+import { connectSlack, logger, startServer } from './helpers'
 import config from './config'
 import { createOnMessageListener } from './listeners/message'
 
@@ -16,6 +16,9 @@ const app = async () => {
 
     // attach listeners
     rtm.on('message', createOnMessageListener(web))
+
+    // express
+    startServer()
   } catch(error) {
     logger.error(error)
   }
