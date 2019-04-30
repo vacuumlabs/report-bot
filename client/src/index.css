@@ -1,0 +1,16 @@
+html {
+  height: 100%;
+  margin: 0;
+  font-family: "Eina01", "Raleway", sans-serif;
+  background-color: black;
+}
+
+body {
+  height: 100%;
+  max-width: 1368px;
+  margin: 0 auto;
+}
+
+#root {
+  height: 100%;
+}

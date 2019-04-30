@@ -7,7 +7,7 @@
   "author": "Tomas Fabry <tomas.fabry@vacuumlabs.com>",
   "license": "Unlicense",
   "scripts": {
-    "clean": "rimraf dist",
+    "clean": "rimraf dist && rimraf node_modules",
     "dev": "babel-node -- src/index.js",
     "knex": "knex --knexfile src/knex/knexfile.js",
     "eslint": "eslint src",
