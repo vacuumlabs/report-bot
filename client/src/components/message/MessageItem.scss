@@ -1,0 +1,70 @@
+.MessageItem {
+  display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    margin: 30px 40px;
+
+  .icon {
+    border: 1px solid #E5E5E5;
+    padding: 4px;
+    font-size: 0.7em;
+  }
+
+  .authorPicture {
+    padding-right: 10px;
+  }
+
+  .messageInfo {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+  }
+
+  .authorName {
+    color: #DEDEDF;
+    font-weight: bold;
+  }
+
+  .messageDateTimeChannel {
+    color: #A2A0A9;
+    font-size: 0.7em;
+    padding: 0 8px;
+  }
+
+  .messagePermalink a {
+    color: #0E79C0;
+    text-decoration: none;
+    font-size: 0.85em;
+  }
+
+  .messageTitle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 5px 0;
+  }
+
+  .messageTitleText {
+    font-weight: bold;
+    margin-left: 0.5em;
+  }
+
+  .messageContent {
+    font-size: 0.9em;
+    line-height: 1.5em;
+  }
+
+  .replies {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 5px 0;
+  }
+
+  .replyCount {
+    color: #196CBA;
+    font-size: 0.7em;
+    font-weight: bold;
+    margin-left: 1em;
+  }
+}
