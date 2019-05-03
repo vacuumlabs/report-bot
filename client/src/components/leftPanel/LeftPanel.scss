@@ -5,6 +5,7 @@
   width: 220px;
   background-color: #253442;
   color: white;
+  overflow-y: auto;
 
   .logo {
     width: 152px;
@@ -21,17 +22,14 @@
     padding: 0;
     margin: 0;
   }
-  
-  li {
-    padding: 5px 18px;
-  }
-  
-  li:hover {
-    background-color: #4B5967;
-  }
 
   .showAll {
     padding: 5px 18px;
     color: #7991A6;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    text-align: left;
   }
 }
