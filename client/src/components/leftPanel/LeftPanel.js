@@ -19,18 +19,15 @@ class LeftPanel extends Component {
     
     fetch(`${host}:${port}/api/tags`)
       .then(res => res.json())
-      .then(tags => this.setState({tags, allVisible: tags.length <= config.tagCountLimit}));
+      .then(tags => this.setState({tags, allVisible: tags.length <= config.tagCountLimit}))
   }
 
   toggleAllVisible = () => {
     this.setState({ allVisible: !this.state.allVisible })
   }
 
-  setSelectedTag = (tag) => {
-    this.setState({ selectedTag: tag })
-  }
-
   render() {
+    const { onSelectTag } = this.props
     const { tags, allVisible } = this.state
     const tagsToShow = allVisible ? tags : tags.slice(0, config.tagCountLimit)
 
@@ -40,7 +37,7 @@ class LeftPanel extends Component {
         <strong className="sectionTitle">Select tag</strong>
         <ul>
           {tagsToShow.map(tag => 
-            (<Tag key={tag.tag} tag={tag} onClick={this.setSelectedTag} />)
+            (<Tag key={tag.tag} tag={tag} onClick={ onSelectTag } />)
           )}
         </ul>
         {!allVisible && <button type="button" className="showAll" onClick={this.toggleAllVisible}>Show all</button>}

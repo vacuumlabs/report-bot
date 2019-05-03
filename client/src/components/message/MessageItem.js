@@ -4,7 +4,7 @@ import author2 from '../../assets/author2.png'
 import './MessageItem.scss'
 
 function MessageItem({message}) {
-  const {authorName, dateTime, channel, permalink, title, iconText, text, replies} = message
+  const {user: authorName, ts: dateTime, channel, permalink, message: text, response_to } = message
   return (
     <div className="MessageItem">
       <div className="authorPicture">
@@ -19,13 +19,13 @@ function MessageItem({message}) {
           </div>
         </div>
         <div className="messageTitle">
-          <div className="icon">{iconText}</div>
-          <div className="messageTitleText">{title}</div>
+          <div className="icon">KE</div>
+          <div className="messageTitleText">Title</div>
         </div>
         <div className="messageContent">{text}</div>
-        {replies && <div className="replies">
+        {response_to && <div className="replies">
           <img src={author2} alt="author" />
-          <div className="replyCount">{replies.length} {replies.length === 1 ? 'reply' : 'replies'}</div>
+          <div className="replyCount">1 reply</div>
         </div>}
       </div>
     </div>
