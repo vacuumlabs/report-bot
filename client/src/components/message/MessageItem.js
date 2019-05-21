@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { apiCall } from '../../utils/api'
+import { formatTs } from '../../utils/helpers'
 import author2 from '../../assets/author2.png'
 import './MessageItem.scss'
 
@@ -38,8 +39,9 @@ class MessageItem extends Component {
   }
 
   render() {
-    const { ts: dateTime, permalink, message: text, response_to } = this.props.message
+    const { ts, permalink, message: text, response_to } = this.props.message
     const { authorName, authorPicture, channelName } = this.state
+    const dateTime = formatTs(ts)
     return (
       <div className="MessageItem">
         <div className="authorPicture">
