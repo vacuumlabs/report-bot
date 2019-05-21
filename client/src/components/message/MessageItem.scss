@@ -4,6 +4,12 @@
     align-items: flex-start;
     margin: 30px 40px;
 
+  &:hover {
+    .messagePermalink {
+      display: block;
+    }
+  }
+
   .icon {
     border: 1px solid #E5E5E5;
     padding: 4px;
@@ -29,6 +35,10 @@
     color: #A2A0A9;
     font-size: 0.7em;
     padding: 0 8px;
+  }
+
+  .messagePermalink {
+    display: none;
   }
 
   .messagePermalink a {

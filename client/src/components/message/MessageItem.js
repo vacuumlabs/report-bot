@@ -15,7 +15,7 @@ function MessageItem({message}) {
           <div className="authorName">{authorName}</div>
           <div className="messageDateTimeChannel">{dateTime} in {channel}</div>
           <div className="messagePermalink">
-            <a href={permalink}>Go to message on Slack</a>
+            <a href={permalink} target='_blank' rel='noopener noreferrer'>Go to message on Slack</a>
           </div>
         </div>
         <div className="messageTitle">
