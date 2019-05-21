@@ -1,35 +1,71 @@
-import React from 'react'
-import author from '../../assets/author.png'
+import React, { Component } from 'react'
+import { apiCall } from '../../utils/api'
 import author2 from '../../assets/author2.png'
 import './MessageItem.scss'
 
-function MessageItem({message}) {
-  const {user: authorName, ts: dateTime, channel, permalink, message: text, response_to } = message
-  return (
-    <div className="MessageItem">
-      <div className="authorPicture">
-        <img src={author} alt="author" />
-      </div>
-      <div className="messageData">
-        <div className="messageInfo">
-          <div className="authorName">{authorName}</div>
-          <div className="messageDateTimeChannel">{dateTime} in {channel}</div>
-          <div className="messagePermalink">
-            <a href={permalink} target='_blank' rel='noopener noreferrer'>Go to message on Slack</a>
+class MessageItem extends Component {
+  constructor() {
+    super()
+    this.state = {
+      authorName: '',
+      authorPicture: '',
+      channelName: '',
+    }
+  }
+
+  async componentDidMount() {
+    const { user, channel } = this.props.message
+
+    const [profileData, channelData] = await Promise.all([
+      apiCall('users.profile.get', { user }),
+      apiCall('channels.info', { channel }),
+    ])
+
+    let authorName = ''
+    let authorPicture = ''
+    let channelName = ''
+    
+    if (profileData.ok) {
+      authorName = profileData.profile.real_name
+      authorPicture = profileData.profile.image_32
+    }
+
+    if (channelData.ok) {
+      channelName = channelData.channel.name
+    }
+
+    this.setState({ authorName, authorPicture, channelName })
+  }
+
+  render() {
+    const { ts: dateTime, permalink, message: text, response_to } = this.props.message
+    const { authorName, authorPicture, channelName } = this.state
+    return (
+      <div className="MessageItem">
+        <div className="authorPicture">
+          <img src={authorPicture} alt="author" />
+        </div>
+        <div className="messageData">
+          <div className="messageInfo">
+            <div className="authorName">{authorName}</div>
+            <div className="messageDateTimeChannel">{dateTime} in {channelName}</div>
+            <div className="messagePermalink">
+              <a href={permalink} target='_blank' rel='noopener noreferrer'>Go to message on Slack</a>
+            </div>
           </div>
+          <div className="messageTitle">
+            <div className="icon">KE</div>
+            <div className="messageTitleText">Title</div>
+          </div>
+          <div className="messageContent">{text}</div>
+          {response_to && <div className="replies">
+            <img src={author2} alt="author" />
+            <div className="replyCount">1 reply</div>
+          </div>}
         </div>
-        <div className="messageTitle">
-          <div className="icon">KE</div>
-          <div className="messageTitleText">Title</div>
-        </div>
-        <div className="messageContent">{text}</div>
-        {response_to && <div className="replies">
-          <img src={author2} alt="author" />
-          <div className="replyCount">1 reply</div>
-        </div>}
       </div>
-    </div>
-  )
+    )
+  }
 }
 
 export default MessageItem
