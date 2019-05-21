@@ -10,6 +10,9 @@ export default transenv()(({str, bool, num}) => {
       host: str('REACT_APP_SERVER_HOST'),
       port: str('REACT_APP_SERVER_PORT'),
     },
+    slack: {
+      apiToken: str('REACT_APP_SLACK_API_TOKEN'),
+    },
     tagCountLimit: str('REACT_APP_TAG_COUNT_LIMIT', 20),
   }
 })
