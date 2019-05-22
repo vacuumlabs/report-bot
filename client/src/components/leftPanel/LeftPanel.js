@@ -33,7 +33,9 @@ class LeftPanel extends Component {
 
     return (
       <div className="LeftPanel">
-        <img className="logo" src={vacuumLogo} alt="VacuumLabs logo" />
+        <a href='/'>
+          <img className="logo" src={vacuumLogo} alt="VacuumLabs logo" />
+        </a>
         <strong className="sectionTitle">Select tag</strong>
         <ul>
           {tagsToShow.map(tag => 

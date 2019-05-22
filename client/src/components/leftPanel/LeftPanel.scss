@@ -7,10 +7,15 @@
   color: white;
   overflow-y: auto;
 
-  .logo {
-    width: 152px;
-    margin: 30px auto;
+  a {
+    display: flex;
+    
+    .logo {
+      width: 152px;
+      margin: 30px auto;
+    }
   }
+  
 
   .sectionTitle {
     padding: 30px 18px 5px 18px;
