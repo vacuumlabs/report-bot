@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { apiCall } from '../../utils/api'
 import { formatTs } from '../../utils/helpers'
 import author2 from '../../assets/author2.png'
+import { Link } from '../ui'
 import './MessageItem.scss'
 
 class MessageItem extends Component {
@@ -52,7 +53,7 @@ class MessageItem extends Component {
             <div className="authorName">{authorName}</div>
             <div className="messageDateTimeChannel">{dateTime} in {channelName}</div>
             <div className="messagePermalink">
-              <a href={permalink} target='_blank' rel='noopener noreferrer'>Go to message on Slack</a>
+              <Link to={permalink}>Go to message on Slack</Link>
             </div>
           </div>
           <div className="messageTitle">
