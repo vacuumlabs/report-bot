@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import LeftPanel from './components/leftPanel/LeftPanel'
 import TopPanel from './components/topPanel/TopPanel'
 import MessageList from './components/message/MessageList'
+import { apiCall } from './utils/api'
 import config from './config'
 import './App.scss'
 
@@ -9,8 +10,17 @@ class App extends Component {
   constructor() {
     super()
     this.state = {
+      customEmojis: {},
       reports: [],
       selectedTag: null
+    }
+  }
+
+  async componentDidMount() {
+    const emojisData = await apiCall('emoji.list')
+
+    if (emojisData.ok) {
+      this.setState({ customEmojis: emojisData.emoji })
     }
   }
 
@@ -41,7 +51,7 @@ class App extends Component {
         <LeftPanel onSelectTag={ this.handleSelectTag } />
         <div className="content">
           <TopPanel iconText="KE" title="Košice" />
-          <MessageList reports={ reports }/>
+          <MessageList reports={ reports } customEmojis={ this.state.customEmojis }/>
         </div>  
       </div>
     )

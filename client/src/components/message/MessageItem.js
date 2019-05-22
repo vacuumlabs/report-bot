@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
+import author2 from '../../assets/author2.png'
 import { apiCall } from '../../utils/api'
 import { formatTs } from '../../utils/helpers'
-import author2 from '../../assets/author2.png'
 import { Link } from '../ui'
+import MessageContent from './MessageContent'
 import './MessageItem.scss'
 
 class MessageItem extends Component {
@@ -40,9 +41,10 @@ class MessageItem extends Component {
   }
 
   render() {
-    const { ts, permalink, message: text, response_to } = this.props.message
+    const { customEmojis, message: { ts, permalink, message: text, response_to }} = this.props
     const { authorName, authorPicture, channelName } = this.state
     const dateTime = formatTs(ts)
+
     return (
       <div className="MessageItem">
         <div className="authorPicture">
@@ -56,11 +58,7 @@ class MessageItem extends Component {
               <Link to={permalink}>Go to message on Slack</Link>
             </div>
           </div>
-          <div className="messageTitle">
-            <div className="icon">KE</div>
-            <div className="messageTitleText">Title</div>
-          </div>
-          <div className="messageContent">{text}</div>
+          <MessageContent text={text} customEmojis={customEmojis} />
           {response_to && <div className="replies">
             <img src={author2} alt="author" />
             <div className="replyCount">1 reply</div>

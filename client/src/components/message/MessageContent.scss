@@ -1,0 +1,25 @@
+.MessageContent {
+  margin: 0.5em 0 0 0;
+  line-height: 1.2em;
+  white-space: pre-wrap;
+
+  code {
+    color: #e01e5a;
+    background-color: #f7f7f9;
+    border: 1px solid #e1e1e8;
+    border-radius: 3px;
+    padding: 2px 3px 1px;
+  }
+
+  pre {
+    margin: .5rem 0 .2rem;
+    padding: 8px;
+    line-height: 1.15rem;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: 4px;
+    background: #f8f8f8;
+    font-variant-ligatures: none;
+    word-break: normal;
+    tab-size: 4;
+  }
+}

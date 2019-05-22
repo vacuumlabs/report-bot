@@ -10,12 +10,6 @@
     }
   }
 
-  .icon {
-    border: 1px solid #E5E5E5;
-    padding: 4px;
-    font-size: 0.7em;
-  }
-
   .authorPicture {
     padding-right: 10px;
   }
@@ -40,23 +34,6 @@
   .messagePermalink {
     display: none;
     font-size: 0.85em;
-  }
-
-  .messageTitle {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin: 5px 0;
-  }
-
-  .messageTitleText {
-    font-weight: bold;
-    margin-left: 0.5em;
-  }
-
-  .messageContent {
-    font-size: 0.9em;
-    line-height: 1.5em;
   }
 
   .replies {

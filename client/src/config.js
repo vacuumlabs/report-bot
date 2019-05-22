@@ -12,6 +12,7 @@ export default transenv()(({str, bool, num}) => {
     },
     slack: {
       apiToken: str('REACT_APP_SLACK_API_TOKEN'),
+      workspaceName: str('REACT_APP_SLACK_WORKSPACE_NAME'),
     },
     tagCountLimit: str('REACT_APP_TAG_COUNT_LIMIT', 20),
   }
