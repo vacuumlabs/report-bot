@@ -1,11 +1,14 @@
 import React from 'react'
+import { Emoji } from '../ui'
 import './TopPanel.scss'
 
-function TopPanel({iconText, title}) {
+function TopPanel({ customEmojis, selectedTag }) {
+  const showEmoji = selectedTag in customEmojis
+
   return (
     <div className="TopPanel">
-      <div className="icon">{iconText}</div>
-      <h2 className="title">{title}</h2>
+      { showEmoji && <Emoji className="emoji" name={selectedTag} customEmojis={customEmojis} /> }
+      <h2 className="title">{selectedTag}</h2>
     </div>
   )
 }

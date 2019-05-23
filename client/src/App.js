@@ -44,14 +44,14 @@ class App extends Component {
   }
 
   render() {
-    const { reports } = this.state
+    const { customEmojis, reports, selectedTag } = this.state
 
     return (
       <div className="container">
         <LeftPanel onSelectTag={ this.handleSelectTag } />
         <div className="content">
-          <TopPanel iconText="KE" title="Košice" />
-          <MessageList reports={ reports } customEmojis={ this.state.customEmojis }/>
+          <TopPanel selectedTag={ selectedTag } customEmojis={ customEmojis } />
+          <MessageList reports={ reports } customEmojis={ customEmojis } />
         </div>  
       </div>
     )
