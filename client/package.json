@@ -9,6 +9,7 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-emoji-render": "^0.6.0",
+    "react-loader-spinner": "^2.3.0",
     "react-scripts": "3.0.0",
     "slack-message-parser": "^1.0.3",
     "transenv": "^1.0.3"

@@ -1,41 +1,47 @@
 import React, { Component } from 'react'
-import { getChannelName, getUserInfo } from '../../utils/slackApi'
-import { formatTs } from '../../utils/helpers'
-import { Link } from '../ui'
+import { loadMessageData } from '../../utils/slackApi'
+import { Link, Loader } from '../ui'
 import MessageContent from './MessageContent'
 import ParentPreview from './ParentPreview'
 import Replies from './Replies'
 import './MessageItem.scss'
 
 class MessageItem extends Component {
-  constructor() {
-    super()
-    this.state = {
-      authorName: '',
-      authorPicture: '',
-      channelName: '',
-    }
+  state = {
+    messageData: null,
   }
 
   async componentDidMount() {
-    const { channel, user } = this.props.message
+    const messageData = await loadMessageData(this.props.message)
 
-    const [userInfo, channelName] = await Promise.all([
-      getUserInfo(user),
-      getChannelName(channel),
-    ])
-    
     this.setState({
-      authorName: userInfo ? userInfo.userName : '',
-      authorPicture: userInfo ? userInfo.userPicture : '',
-      channelName,
+      messageData,
     })
   }
 
   render() {
-    const { customEmojis, message: { channel, ts, permalink, message: text, response_to }} = this.props
-    const { authorName, authorPicture, channelName } = this.state
-    const dateTime = formatTs(ts)
+    const { customEmojis } = this.props
+    const { messageData } = this.state
+
+    if (!messageData) {
+      return <Loader size={ 40 } />
+    }
+
+    const {
+      authorName,
+      authorPicture,
+      channel,
+      channelName,
+      dateTime,
+      firstReplyAuthorPicture,
+      parentText,
+      parentTs,
+      permalink,
+      repliesCount,
+      text,
+      threadTs,
+      ts
+    } = messageData
 
     return (
       <div className="MessageItem">
@@ -50,12 +56,20 @@ class MessageItem extends Component {
               <Link to={permalink}>Go to message on Slack</Link>
             </div>
           </div>
-          { !!response_to && <ParentPreview channel={ channel } customEmojis={customEmojis} ts={ response_to } /> }
+          { !!parentTs &&
+            <ParentPreview
+              channel={channel}
+              customEmojis={customEmojis}
+              parentTs={parentTs}
+              parentText={parentText}
+              threadTs={threadTs}
+            />
+          }
           <MessageContent text={text} customEmojis={customEmojis} />
           {
-            response_to
-              ? <Replies channel={channel} customText={'View newer replies'} noPicture ts={response_to} />
-              : <Replies channel={channel} ts={ts} />
+            parentTs
+              ? <Replies channel={channel} customText={'View newer replies'} repliesCount={repliesCount} ts={parentTs} />
+              : <Replies channel={channel} firstReplyAuthorPicture={firstReplyAuthorPicture} repliesCount={repliesCount} ts={ts} />
           }
           
         </div>

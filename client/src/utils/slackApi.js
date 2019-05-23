@@ -1,4 +1,5 @@
 import config from '../config'
+import { formatTs } from './helpers'
 
 export const apiCall = async (endpoint, params) => {
   const { apiToken } = config.slack
@@ -63,5 +64,31 @@ export const getUserInfo = async (user) => {
   return {
     userName: profileData.profile.real_name,
     userPicture: profileData.profile.image_32,
+  }
+}
+
+export const loadMessageData = async (report) => {
+  const { channel, message: text, permalink, response_to: parentTs, ts, user } = report
+
+  const [userInfo, channelName, messageInfo] = await Promise.all([
+    getUserInfo(user),
+    getChannelName(channel),
+    getChannelMessageInfo(channel, parentTs || ts),
+  ])
+
+  return {
+    authorName: userInfo ? userInfo.userName : '',
+    authorPicture: userInfo ? userInfo.userPicture : '',
+    channel,
+    channelName,
+    dateTime: formatTs(ts),
+    firstReplyAuthorPicture: messageInfo ? messageInfo.firstReplyAuthorPicture : '',
+    parentText: parentTs ? messageInfo.text : '',
+    parentTs,
+    permalink,
+    repliesCount: messageInfo ? messageInfo.repliesCount : 0,
+    text,
+    threadTs: parentTs ? messageInfo.threadTs : '',
+    ts,
   }
 }

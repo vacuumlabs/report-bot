@@ -2,12 +2,14 @@ import React, { Component } from 'react'
 import vacuumLogo from '../../assets/vacuum-logo-light.svg'
 import config from '../../config'
 import { getTags } from '../../utils/serverApi'
+import { Loader } from '../ui'
 import Tag from './Tag'
 import './LeftPanel.scss'
 
 class LeftPanel extends Component {
   state = {
     allVisible: true,
+    loading: true,
     tags: [],
   }
 
@@ -16,6 +18,7 @@ class LeftPanel extends Component {
 
     this.setState({
       allVisible: tags.length <= config.tagCountLimit,
+      loading: false,
       tags,
     })
   }
@@ -26,7 +29,7 @@ class LeftPanel extends Component {
 
   render() {
     const { onSelectTag } = this.props
-    const { allVisible, tags } = this.state
+    const { allVisible, loading, tags } = this.state
     const tagsToShow = allVisible ? tags : tags.slice(0, config.tagCountLimit)
 
     return (
@@ -35,12 +38,15 @@ class LeftPanel extends Component {
           <img className="logo" src={vacuumLogo} alt="VacuumLabs logo" />
         </a>
         <strong className="sectionTitle">Select tag</strong>
-        <ul>
-          {tagsToShow.map(tag => 
-            (<Tag key={tag.tag} tag={tag} onClick={ onSelectTag } />)
-          )}
-        </ul>
-        {!allVisible && <button type="button" className="showAll" onClick={this.toggleAllVisible}>Show all</button>}
+        { loading && <Loader light /> }
+        {
+          !loading && <ul>
+            {tagsToShow.map(tag => 
+              (<Tag key={tag.tag} tag={tag} onClick={ onSelectTag } />)
+            )}
+          </ul>
+        }
+        { !loading && !allVisible && <button type="button" className="showAll" onClick={this.toggleAllVisible}>Show all</button>}
       </div>
     )
   }
