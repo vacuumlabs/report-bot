@@ -3,6 +3,7 @@ import { getChannelName, getUserInfo } from '../../utils/slackApi'
 import { formatTs } from '../../utils/helpers'
 import { Link } from '../ui'
 import MessageContent from './MessageContent'
+import ParentPreview from './ParentPreview'
 import Replies from './Replies'
 import './MessageItem.scss'
 
@@ -49,8 +50,14 @@ class MessageItem extends Component {
               <Link to={permalink}>Go to message on Slack</Link>
             </div>
           </div>
+          { !!response_to && <ParentPreview channel={ channel } customEmojis={customEmojis} ts={ response_to } /> }
           <MessageContent text={text} customEmojis={customEmojis} />
-          <Replies channel={channel} ts={ts} />
+          {
+            response_to
+              ? <Replies channel={channel} customText={'View newer replies'} noPicture ts={response_to} />
+              : <Replies channel={channel} ts={ts} />
+          }
+          
         </div>
       </div>
     )

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import config from '../../config'
-import { getChannelRepliesInfo } from '../../utils/slackApi'
+import { normalizeTs } from '../../utils/helpers'
+import { getChannelMessageInfo } from '../../utils/slackApi'
 import { Link } from '../ui'
 import './Replies.scss'
 
@@ -16,26 +17,26 @@ class Replies extends Component {
   async componentDidMount() {
     const { channel, ts } = this.props
 
-    const repliesData = await getChannelRepliesInfo(channel, ts)
+    const messageData = await getChannelMessageInfo(channel, ts)
 
     this.setState({
-      firstReplyAuthorPicture: repliesData ? repliesData.firstReplyAuthorPicture : '',
-      repliesCount: repliesData ? repliesData.repliesCount : 0,
+      firstReplyAuthorPicture: messageData ? messageData.firstReplyAuthorPicture : '',
+      repliesCount: messageData ? messageData.repliesCount : 0,
     })
   }
 
   render() {
-    const { channel, ts } = this.props
+    const { channel, customText, noPicture, ts } = this.props
     const { firstReplyAuthorPicture, repliesCount } = this.state
     const { workspaceName } = config.slack
-    const normalizedTs = ts.replace(/\D/g,'')
+    const normalizedTs = normalizeTs(ts)
 
     return (
-      <div className='Replies'>
-        {!!repliesCount && <div className="replies">
-          <img className='replyAuthorPicture' src={firstReplyAuthorPicture} alt="reply author" />
+      <div>
+        {!!repliesCount && <div className='Replies'>
+          { !noPicture && <img className='replyAuthorPicture' src={firstReplyAuthorPicture} alt="reply author" /> }
           <Link to={`https://${workspaceName}.slack.com/conversation/${channel}/p${normalizedTs}`}>
-            {repliesCount} {repliesCount === 1 ? 'reply' : 'replies' }
+            { customText || `${ repliesCount } ${ repliesCount === 1 ? 'reply' : 'replies' }` }
           </Link>
         </div>}
       </div>

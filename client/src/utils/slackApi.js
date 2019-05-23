@@ -19,7 +19,7 @@ export const getChannelName = async (channel) => {
   return channelData.channel.name
 }
 
-export const getChannelRepliesInfo = async (channel, ts) => {
+export const getChannelMessageInfo = async (channel, ts) => {
   const repliesData = await apiCall('channels.replies', { channel, thread_ts: ts })
 
   if (!repliesData.ok) {
@@ -32,12 +32,14 @@ export const getChannelRepliesInfo = async (channel, ts) => {
     return
   }
 
-  const { replies } = messages[0]
+  const { replies, text, thread_ts: threadTs } = messages[0]
   const firstReplyUserInfo = await getUserInfo(replies[0].user)
 
   return {
+    firstReplyAuthorPicture: firstReplyUserInfo.userPicture,
     repliesCount: replies.length,
-    firstReplyAuthorPicture: firstReplyUserInfo.userPicture
+    text,
+    threadTs,
   }
 }
 
