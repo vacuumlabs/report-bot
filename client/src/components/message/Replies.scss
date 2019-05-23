@@ -1,0 +1,19 @@
+.Replies {
+  .replyAuthorPicture {
+    width: 24px;
+    height: 24px;
+  }
+
+  .replies {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px 0;
+  }
+  
+  .Link {
+    font-size: 0.7em;
+    font-weight: bold;
+    margin-left: 1em;
+  }
+}

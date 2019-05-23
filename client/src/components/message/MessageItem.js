@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import author2 from '../../assets/author2.png'
-import { apiCall } from '../../utils/api'
+import { getChannelName, getUserInfo } from '../../utils/api'
 import { formatTs } from '../../utils/helpers'
 import { Link } from '../ui'
 import MessageContent from './MessageContent'
+import Replies from './Replies'
 import './MessageItem.scss'
 
 class MessageItem extends Component {
@@ -17,31 +17,22 @@ class MessageItem extends Component {
   }
 
   async componentDidMount() {
-    const { user, channel } = this.props.message
+    const { channel, user } = this.props.message
 
-    const [profileData, channelData] = await Promise.all([
-      apiCall('users.profile.get', { user }),
-      apiCall('channels.info', { channel }),
+    const [userInfo, channelName] = await Promise.all([
+      getUserInfo(user),
+      getChannelName(channel),
     ])
-
-    let authorName = ''
-    let authorPicture = ''
-    let channelName = ''
     
-    if (profileData.ok) {
-      authorName = profileData.profile.real_name
-      authorPicture = profileData.profile.image_32
-    }
-
-    if (channelData.ok) {
-      channelName = channelData.channel.name
-    }
-
-    this.setState({ authorName, authorPicture, channelName })
+    this.setState({
+      authorName: userInfo ? userInfo.userName : '',
+      authorPicture: userInfo ? userInfo.userPicture : '',
+      channelName,
+    })
   }
 
   render() {
-    const { customEmojis, message: { ts, permalink, message: text, response_to }} = this.props
+    const { customEmojis, message: { channel, ts, permalink, message: text, response_to }} = this.props
     const { authorName, authorPicture, channelName } = this.state
     const dateTime = formatTs(ts)
 
@@ -59,10 +50,7 @@ class MessageItem extends Component {
             </div>
           </div>
           <MessageContent text={text} customEmojis={customEmojis} />
-          {response_to && <div className="replies">
-            <img src={author2} alt="author" />
-            <div className="replyCount">1 reply</div>
-          </div>}
+          <Replies channel={channel} ts={ts} />
         </div>
       </div>
     )
