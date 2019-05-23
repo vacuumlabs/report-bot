@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import config from '../../config'
-import { apiCall } from '../../utils/api'
+import { apiCall } from '../../utils/slackApi'
 import { Link } from '../ui'
 import './UserLink.scss'
 

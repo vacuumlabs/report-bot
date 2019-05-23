@@ -2,40 +2,27 @@ import React, { Component } from 'react'
 import LeftPanel from './components/leftPanel/LeftPanel'
 import TopPanel from './components/topPanel/TopPanel'
 import MessageList from './components/message/MessageList'
-import { apiCall } from './utils/api'
-import config from './config'
+import { getReportsByTag } from './utils/serverApi'
+import { getCustomEmojis } from './utils/slackApi'
 import './App.scss'
 
 class App extends Component {
-  constructor() {
-    super()
-    this.state = {
-      customEmojis: {},
-      reports: [],
-      selectedTag: null
-    }
+  state = {
+    customEmojis: {},
+    reports: [],
+    selectedTag: null,
   }
 
   async componentDidMount() {
-    const emojisData = await apiCall('emoji.list')
+    const customEmojis = await getCustomEmojis()
 
-    if (emojisData.ok) {
-      this.setState({ customEmojis: emojisData.emoji })
-    }
+    this.setState({
+      customEmojis,
+    })
   }
 
   handleSelectTag = async (tag) => {
-    const { host, port } = config.server
-
-    const response = await fetch(`${host}:${port}/api/reports-by-tags`, {
-      method: 'POST',
-      body: JSON.stringify({
-        tag
-      }),
-      headers: {'Content-Type': 'application/json'}
-    })
-
-    const reports = await response.json()
+    const reports = await getReportsByTag(tag)
 
     this.setState({
       selectedTag: tag,

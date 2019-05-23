@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { getChannelName, getUserInfo } from '../../utils/api'
+import { getChannelName, getUserInfo } from '../../utils/slackApi'
 import { formatTs } from '../../utils/helpers'
 import { Link } from '../ui'
 import MessageContent from './MessageContent'

@@ -41,6 +41,16 @@ export const getChannelRepliesInfo = async (channel, ts) => {
   }
 }
 
+export const getCustomEmojis = async () => {
+  const emojisData = await apiCall('emoji.list')
+
+  if (!emojisData.ok) {
+    return []
+  }
+
+  return emojisData.emoji
+}
+
 export const getUserInfo = async (user) => {
   const profileData = await apiCall('users.profile.get', { user })
 

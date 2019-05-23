@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import config from '../../config'
-import { getChannelRepliesInfo } from '../../utils/api'
+import { getChannelRepliesInfo } from '../../utils/slackApi'
 import { Link } from '../ui'
 import './Replies.scss'
 

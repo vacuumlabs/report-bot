@@ -1,25 +1,23 @@
 import React, { Component } from 'react'
-import config from '../../config'
 import vacuumLogo from '../../assets/vacuum-logo-light.svg'
+import config from '../../config'
+import { getTags } from '../../utils/serverApi'
 import Tag from './Tag'
 import './LeftPanel.scss'
 
 class LeftPanel extends Component {
-  constructor() {
-    super()
-    this.state = {
-      tags: [],
-      allVisible: true,
-      selectedTag: null
-    }
+  state = {
+    allVisible: true,
+    tags: [],
   }
 
-  componentDidMount() {
-    const { host, port } = config.server
-    
-    fetch(`${host}:${port}/api/tags`)
-      .then(res => res.json())
-      .then(tags => this.setState({tags, allVisible: tags.length <= config.tagCountLimit}))
+  async componentDidMount() {
+    const tags = await getTags()
+
+    this.setState({
+      allVisible: tags.length <= config.tagCountLimit,
+      tags,
+    })
   }
 
   toggleAllVisible = () => {
@@ -28,7 +26,7 @@ class LeftPanel extends Component {
 
   render() {
     const { onSelectTag } = this.props
-    const { tags, allVisible } = this.state
+    const { allVisible, tags } = this.state
     const tagsToShow = allVisible ? tags : tags.slice(0, config.tagCountLimit)
 
     return (
