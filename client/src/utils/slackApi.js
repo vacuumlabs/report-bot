@@ -1,11 +1,8 @@
-import config from '../config'
 import { formatTs } from './helpers'
 
 export const apiCall = async (endpoint, params) => {
-  const { apiToken } = config.slack
-  const paramsWithToken = { token: apiToken, ...params }
-  const queryParams = Object.keys(paramsWithToken).map(key => key + '=' + paramsWithToken[key]).join('&')
-  const response = await fetch(`https://slack.com/api/${endpoint}?${queryParams}`)
+  const queryParams = Object.keys(params).map(key => key + '=' + params[key]).join('&')
+  const response = await fetch(`/api/slack/${endpoint}?${queryParams}`)
   const data = await response.json()
   return data
 }

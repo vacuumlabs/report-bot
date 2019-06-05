@@ -27,6 +27,7 @@ export default transenv()(({str, bool, num}) => {
     },
     slack: {
       botToken: str('SLACK_BOT_TOKEN'),
+      appToken: str('SLACK_APP_TOKEN'),
     },
   }
 })

@@ -1,9 +1,5 @@
-import config from '../config'
-
 export const getReportsByTag = async (tag) => {
-  const { host, port } = config.server
-
-  const response = await fetch(`${host}:${port}/api/reports-by-tags`, {
+  const response = await fetch(`/api/reports-by-tags`, {
     method: 'POST',
     body: JSON.stringify({
       tag
@@ -15,7 +11,6 @@ export const getReportsByTag = async (tag) => {
 }
 
 export const getTags = async () => {
-  const { host, port } = config.server
-  const response = await fetch(`${host}:${port}/api/tags`)
+  const response = await fetch(`/api/tags`)
   return response.json()
 }

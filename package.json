@@ -8,8 +8,9 @@
     "build": "yarn --cwd client && yarn --cwd client build && yarn --cwd server && yarn --cwd server build",
     "clean": "rimraf node_modules && yarn --cwd client clean && yarn --cwd server clean",
     "client": "yarn --cwd client start",
-    "server": "yarn --cwd server start",
-    "start": "concurrently \"yarn server\" \"yarn client\""
+    "server": "yarn --cwd server dev",
+    "start": "yarn --cwd server start",
+    "dev": "concurrently \"yarn server\" \"yarn client\""
   },
   "devDependencies": {
     "concurrently": "^4.1.0"
