@@ -1,0 +1,19 @@
+{
+    "alias": ["reportbot.vacuumlabs.com"],
+
+    "env": {
+        "NODE_ENV":"production",
+
+        "CLIENT_HOST": "https://report.vacuumlabs.com",
+        "CLIENT_PORT": "443",
+
+        "DB_HOST": "@report-bot-db-host",
+        "DB_PORT": "5432",
+        "DB_USER": "reportbot",
+        "DB_PASSWORD": "@report-bot-db-password",
+        "DB_NAME": "reportbot",
+
+        "SLACK_BOT_TOKEN": "@report-bot-slack-token",
+        "SLACK_APP_TOKEN": "@report-bot-slack-app-token"
+    }
+}
