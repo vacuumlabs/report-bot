@@ -1,7 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import querystring from 'querystring'
-import axios from 'axios'
 
 import { logger } from './index'
 import config from '../config'

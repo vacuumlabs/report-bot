@@ -1,7 +1,7 @@
-import { createLogger, format, transports } from 'winston'
-import config from '../config'
+import {createLogger, format, transports} from 'winston'
+import config from './config'
 
-export const logger = createLogger({
+export default createLogger({
   format: format.combine(
     format.colorize(),
     format.splat(),

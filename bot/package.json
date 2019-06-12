@@ -1,5 +1,5 @@
 {
-  "name": "@report-bot/server",
+  "name": "@report-bot/bot",
   "version": "1.0.0",
   "description": "Slack bot for scraping the content of messages and storing them in a database.",
   "main": "src/index.js",
@@ -26,7 +26,6 @@
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
     "@slack/client": "^4.12.0",
-    "axios": "^0.19.0",
     "express": "^4.16.4",
     "knex": "^0.17.5",
     "pg": "^6.2.4",

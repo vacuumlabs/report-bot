@@ -6,7 +6,6 @@ export default transenv()(({str, bool, num}) => {
 
   return {
     env,
-    port: str('PORT', 5000),
     logLevel: str('LOG_LEVEL', isDevelopment ? 'debug' : 'error'),
     knex: {
       client: 'pg',
@@ -22,7 +21,7 @@ export default transenv()(({str, bool, num}) => {
       },
     },
     slack: {
-      appToken: str('SLACK_APP_TOKEN'),
+      botToken: str('SLACK_BOT_TOKEN'),
     },
   }
 })

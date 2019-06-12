@@ -1,6 +1,6 @@
 import { formatTs } from './helpers'
 
-export const apiCall = async (endpoint, params) => {
+export const apiCall = async (endpoint, params = {}) => {
   const queryParams = Object.keys(params).map(key => key + '=' + params[key]).join('&')
   const response = await fetch(`/api/slack/${endpoint}?${queryParams}`)
   const data = await response.json()

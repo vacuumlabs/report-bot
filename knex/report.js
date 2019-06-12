@@ -1,5 +1,5 @@
 import knex from './index'
-import { logger } from '../helpers'
+import logger from '../logger'
 
 export const addReport = async (report) => {
   try {

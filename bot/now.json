@@ -1,0 +1,15 @@
+{
+  "name": "@report-bot/bot",
+  "version": 1,
+  "env": {
+    "NODE_ENV":"production",
+
+    "DB_HOST": "@report-bot-db-host",
+    "DB_PORT": "5432",
+    "DB_USER": "reportbot",
+    "DB_PASSWORD": "@report-bot-db-password",
+    "DB_NAME": "reportbot",
+
+    "SLACK_BOT_TOKEN": "@report-bot-slack-token"
+  }
+}
