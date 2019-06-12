@@ -65,6 +65,18 @@ async function loadChannels(channelIds) {
   return channels
 }
 
+function normalizeEmoji(emoji) {
+  function url(key) {
+    const u = emoji[key]
+    if (u == null) return null
+    if (u.startsWith('alias:')) return url(u.substring('alias:'.length))
+    return emoji[key]
+  }
+  const res = {}
+  for (const k of Object.keys(emoji)) res[k] = url(k)
+  return res
+}
+
 app.get('/api/reports-by-tags/:tag', async (req, res) => {
   let reports = await getReportsByTag(req.params.tag)
   reports = await Promise.all(reports.map(async (r) => ({
@@ -86,7 +98,7 @@ app.get('/api/reports-by-tags/:tag', async (req, res) => {
     reports,
     users: await loadProfiles(userIds),
     channels: await loadChannels(channelIds),
-    emoji: (await web.emoji.list()).emoji,
+    emoji: normalizeEmoji((await web.emoji.list()).emoji),
   })
 })
 
