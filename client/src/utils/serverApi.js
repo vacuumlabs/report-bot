@@ -1,12 +1,5 @@
 export const getReportsByTag = async (tag) => {
-  const response = await fetch(`/api/reports-by-tags`, {
-    method: 'POST',
-    body: JSON.stringify({
-      tag
-    }),
-    headers: {'Content-Type': 'application/json'}
-  })
-
+  const response = await fetch(`/api/reports-by-tags/${tag}`)
   return response.json()
 }
 

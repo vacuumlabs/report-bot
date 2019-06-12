@@ -10,7 +10,7 @@ class MessageContent extends Component {
   lastElementKey = 0
 
   renderTreeRich = (node) => {
-    const { customEmojis } = this.props
+    const {customEmojis, users} = this.props
 
     switch (node.type) {
       case NodeType.Bold:
@@ -36,7 +36,7 @@ class MessageContent extends Component {
       case NodeType.URL:
         return <Link key={this.lastElementKey++} to={node.url}>{node.url}</Link>
       case NodeType.UserLink:
-        return <UserLink key={this.lastElementKey++} user={node.userID} />
+        return <UserLink key={this.lastElementKey++} user={users[node.userID]} />
       case NodeType.Command:
       default:
         return <></>
@@ -44,7 +44,7 @@ class MessageContent extends Component {
   }
 
   renderTreeSolid = (node) => {
-    const { customEmojis } = this.props
+    const {customEmojis, users} = this.props
 
     switch (node.type) {
       case NodeType.Bold:
@@ -69,7 +69,7 @@ class MessageContent extends Component {
       case NodeType.URL:
         return node.url
       case NodeType.UserLink:
-        return `@${node.userID}`
+        return `@${users[node.userID].display_name}`
       case NodeType.Command:
       default:
         return <></>

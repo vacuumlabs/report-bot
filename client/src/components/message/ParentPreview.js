@@ -5,7 +5,7 @@ import { Link } from '../ui'
 import MessageContent from './MessageContent'
 import './ParentPreview.scss'
 
-function ParentPreview({ channel, customEmojis, parentTs, parentText, threadTs }) {
+function ParentPreview({users, channel, customEmojis, parentTs, parentText, threadTs}) {
   const { workspaceName } = config.slack
   const normalizedTs = normalizeTs(parentTs)
   const firstLine = parentText.split('\n')[0]
@@ -15,7 +15,7 @@ function ParentPreview({ channel, customEmojis, parentTs, parentText, threadTs }
       <span className='prefix'>
         {'replied to a thread: '}
         <Link to={`https://${workspaceName}.slack.com/archives/${channel}/p${normalizedTs}?thread_ts=${threadTs}`}>
-          <MessageContent solid text={firstLine} customEmojis={customEmojis} />
+          <MessageContent solid text={firstLine} users={users} customEmojis={customEmojis} />
         </Link>
         &hellip;
       </span>
