@@ -4422,7 +4422,7 @@ hastscript@^5.0.0:
     property-information "^5.0.1"
     space-separated-tokens "^1.0.0"
 
-he@1.2.x:
+he@1.2.x, he@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
@@ -8877,11 +8877,6 @@ sisteransi@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.0.tgz#77d9622ff909080f1c19e5f4a1df0c1b0a27b88c"
   integrity sha512-N+z4pHB4AmUv0SjveWRd6q1Nj5w62m5jodv+GD8lvmbY/83T/rpbJGZOnK5T149OldDj4Db07BSv9xY4K6NTPQ==
-
-slack-message-parser@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/slack-message-parser/-/slack-message-parser-1.0.3.tgz#64c7d2292faa3047040297277d8804133f378971"
-  integrity sha512-ZinxL+P9/48l9o+embdufFe80N6k9A78SI7ouTDOnyaNz1FQVobNoUBvt/UF2Ztt3zml5ctUKjabva+cghOR1g==
 
 slash@^1.0.0:
   version "1.0.0"

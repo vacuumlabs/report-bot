@@ -1,88 +1,61 @@
 import React, { Component } from 'react'
-import slackMessageParser, { NodeType } from 'slack-message-parser'
+import parse from '../../parseSlack'
 import { Emoji, Link } from '../ui'
 import ChannelLink from './ChannelLink'
 import Quote from './Quote'
 import UserLink from './UserLink'
 import './MessageContent.scss'
 
+function Style({formatting, children}) {
+  const flags = [['*', 'b'], ['_', 'i'], ['~', 'strike']]
+
+  let result = <React.Fragment>{children}</React.Fragment>
+  
+  for (const [flag, Component] of flags) {
+    if (formatting[flag]) result = <Component>{result}</Component>
+  }
+
+  return result
+}
+
 class MessageContent extends Component {
   lastElementKey = 0
 
-  renderTreeRich = (node) => {
+  renderNodes = (nodes) => {
     const {customEmojis, users} = this.props
 
-    switch (node.type) {
-      case NodeType.Bold:
-        return <strong key={this.lastElementKey++}>{node.children.map(this.renderTreeRich)}</strong>
-      case NodeType.ChannelLink:
-        return <ChannelLink key={this.lastElementKey++} channelId={node.channelID} channelName={node.label[0].text} />
-      case NodeType.Code:
-        return <code key={this.lastElementKey++}>{node.text}</code>
-      case NodeType.Emoji:
-        return <Emoji key={this.lastElementKey++} name={node.name} customEmojis={customEmojis} />
-      case NodeType.Italic:
-        return <i key={this.lastElementKey++}>{node.children.map(this.renderTreeRich)}</i>
-      case NodeType.Quote:
-        return <Quote key={this.lastElementKey++}>{node.children[0].text}</Quote>
-      case NodeType.PreText:
-        return <pre key={this.lastElementKey++}>{node.text.trim()}</pre>
-      case NodeType.Root:
-        return <div key={this.lastElementKey++}>{node.children.map(this.renderTreeRich)}</div>
-      case NodeType.Strike:
-        return <del key={this.lastElementKey++}>{node.children.map(this.renderTreeRich)}</del>
-      case NodeType.Text:
-        return node.text
-      case NodeType.URL:
-        return <Link key={this.lastElementKey++} to={node.url}>{node.url}</Link>
-      case NodeType.UserLink:
-        return <UserLink key={this.lastElementKey++} user={users[node.userID]} />
-      case NodeType.Command:
-      default:
-        return <></>
-    }
-  }
+    const rich = !this.props.solid
+    const r = this.renderNodes
 
-  renderTreeSolid = (node) => {
-    const {customEmojis, users} = this.props
-
-    switch (node.type) {
-      case NodeType.Bold:
-        return <strong key={this.lastElementKey++}>{node.children.map(this.renderTreeSolid)}</strong>
-      case NodeType.ChannelLink:
-        return `#${node.label[0].text}`
-      case NodeType.Code:
-      case NodeType.Text:
-        return node.text
-      case NodeType.Emoji:
-        return <Emoji key={this.lastElementKey++} name={node.name} customEmojis={customEmojis} />
-      case NodeType.Italic:
-        return <i key={this.lastElementKey++}>{node.children.map(this.renderTreeSolid)}</i>
-      case NodeType.Quote:
-        return node.children[0].text
-      case NodeType.PreText:
-        return node.text.trim()
-      case NodeType.Root:
-        return <div key={this.lastElementKey++}>{node.children.map(this.renderTreeSolid)}</div>
-      case NodeType.Strike:
-        return <del key={this.lastElementKey++}>{node.children.map(this.renderTreeSolid)}</del>
-      case NodeType.URL:
-        return node.url
-      case NodeType.UserLink:
-        return `@${users[node.userID].display_name}`
-      case NodeType.Command:
-      default:
-        return <></>
+    const elem = {
+      section({quote, children}, key) {
+        const Section = quote ? Quote : React.Fragment
+        return <Section key={key}>{r(children)}</Section>
+      },
+      line({children}, k) {
+        const Line = rich ? 'p' : React.Fragment
+        return <Line key={k}>{r(children)}</Line>
+      },
+      pre: ({text}, k) => rich ? <pre key={k}>{text}</pre> : text,
+      vspace: (node, k) => rich ? <span className="c-mrkdwn__br" key={k}></span> : '',
+      code: ({text}, k) => rich ? <code key={k}>{text}</code> : text,
+      emoji: ({id}, k) => <Emoji name={id} customEmojis={customEmojis} key={k}/>,
+      user: ({id}, k) => rich ? <UserLink user={users[id]} key={k}/> : users[id].display_name,
+      channel: ({id, name}, k) => rich ? <ChannelLink channelId={id} channelName={name} key={k}/> : name,
+      url: ({id, name}, k) => rich ? <Link to={id} key={k}>{name}</Link> : name,
+      span: ({children, style}, k) => <Style key={k} formatting={style}>{r(children)}</Style>,
     }
+
+    return nodes.map((node, key) =>
+      typeof node === 'string' ? node : elem[node.type](node, key.toString())
+    )
   }
 
   render() {
-    const tree = slackMessageParser(this.props.text)
+    const nodes = parse(this.props.text)
 
     return (
-      <div className='MessageContent'>
-        {this.props.solid ? this.renderTreeSolid(tree) : this.renderTreeRich(tree)}
-      </div>
+      <div className='MessageContent'>{this.renderNodes(nodes)}</div>
     )
   }
 }
