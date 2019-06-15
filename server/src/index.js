@@ -9,8 +9,6 @@ import querystring from 'querystring'
 import {getReportsByTag} from './knex/report'
 import {getTags} from './knex/tag'
 
-import slackMessageParser, { NodeType } from 'slack-message-parser'
-
 const app = express()
 const web = new WebClient(config.slack.appToken)
 
@@ -32,14 +30,17 @@ app.get('/api/tags', async (req, res) => {
 })
 
 function mentions(message) {
-  function traverse(node) {
-    if (node.type === NodeType.UserLink) return [node.userID]
-    else return [].concat(...(node.children || []).map(traverse))
+  const regexp = /<@([A-Z0-9]+)>/ug
+  const users = []
+
+  while (true) {
+    const match = regexp.exec(message)
+    if (match == null) break
+    users.push(match[1])
   }
-
-  return traverse(slackMessageParser(message))
+  return users
 }
-
+  
 async function loadProfiles(userIds) {
   const profiles = await Promise.all(
     userIds.map((id) => web.users.profile.get({user: id}))

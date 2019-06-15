@@ -31,7 +31,6 @@
     "express": "^4.16.4",
     "knex": "^0.17.5",
     "pg": "^6.2.4",
-    "slack-message-parser": "^1.0.4",
     "transenv": "^1.0.3",
     "winston": "^3.2.1"
   }
