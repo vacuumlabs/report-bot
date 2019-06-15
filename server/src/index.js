@@ -69,7 +69,7 @@ async function loadChannels(channelIds) {
 function normalizeEmoji(emoji) {
   function url(key) {
     const u = emoji[key]
-    if (u == null) return null
+    if (u == null) return key
     if (u.startsWith('alias:')) return url(u.substring('alias:'.length))
     return emoji[key]
   }

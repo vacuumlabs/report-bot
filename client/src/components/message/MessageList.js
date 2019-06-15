@@ -24,7 +24,8 @@ function MessageItem({message, customEmojis, users, channels}) {
   const author = users[message.user]
   const firstReplyAuthor = message.replies.length >= 2 && users[message.replies[1].user]
   const responseTo = message.response_to
-  const channelName = channels[message.channel].name
+  const channel = channels[message.channel]
+  const channelName = (channel.is_channel ? '#' : '🔒') + channel.name
   const dateTime = formatTs(message.ts)
 
   return (

@@ -3,6 +3,8 @@
 }
 
 .MessageItem {
+  font-size: 15px;
+
   display: flex;
     flex-direction: row;
     align-items: flex-start;
@@ -29,8 +31,7 @@
   }
 
   .authorName {
-    color: #DEDEDF;
-    font-weight: bold;
+    font-weight: 900;
   }
 
   .messageDateTimeChannel {
