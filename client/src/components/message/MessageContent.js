@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import parse from '../../parseSlack'
 import { Emoji, Link } from '../ui'
 import ChannelLink from './ChannelLink'
-import Quote from './Quote'
 import UserLink from './UserLink'
 import './MessageContent.scss'
 
@@ -29,7 +28,7 @@ class MessageContent extends Component {
 
     const elem = {
       section({quote, children}, key) {
-        const Section = quote ? Quote : React.Fragment
+        const Section = quote ? 'blockquote' : React.Fragment
         return <Section key={key}>{r(children)}</Section>
       },
       line({children}, k) {
@@ -37,7 +36,7 @@ class MessageContent extends Component {
         return <Line key={k}>{r(children)}</Line>
       },
       pre: ({text}, k) => rich ? <pre key={k}>{text}</pre> : text,
-      vspace: (node, k) => rich ? <span className="c-mrkdwn__br" key={k}></span> : '',
+      vspace: (node, k) => rich ? <span className="vspace" key={k}></span> : '',
       code: ({text}, k) => rich ? <code key={k}>{text}</code> : text,
       emoji: ({id}, k) => <Emoji name={id} customEmojis={customEmojis} key={k}/>,
       user: ({id}, k) => rich ? <UserLink user={users[id]} key={k}/> : users[id].display_name,

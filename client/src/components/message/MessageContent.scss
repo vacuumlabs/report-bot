@@ -1,6 +1,7 @@
 .MessageContent {
+  font-size: 15px;
   margin: 0.5em 0 0 0;
-  line-height: 1.2em;
+  line-height: 1.46668;
   white-space: pre-wrap;
   display: inline-block;
 
@@ -23,4 +24,32 @@
     word-break: normal;
     tab-size: 4;
   }
+
+  p {
+    margin: 0px;
+  }
+
+  blockquote {
+    position: relative;
+    margin: .25rem 0;
+    padding-left: 16px;
+
+    &:before {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      display: block;
+      width: 4px;
+      border-radius: 8px;
+      background: #e3e4e6;
+      content: '';
+    }
+  }
+
+  span.vspace {
+    display: block;
+    height: 8px;
+  }
 }
+

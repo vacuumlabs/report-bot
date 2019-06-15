@@ -29,7 +29,7 @@ function MessageItem({message, customEmojis, users, channels}) {
 
   return (
     <div className="MessageItem">
-      <a className="authorPicture">
+      <a className="avatar">
         <img src={author.image_48} srcSet={`${author.image_72} 2x`} />
       </a>
       <div className="messageData">
