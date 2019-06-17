@@ -1,13 +1,20 @@
 import transenv from 'transenv'
 
 export default transenv()(({str, bool, num}) => {
-  const env = str('NODE_ENV', 'development')
-  const isDevelopment = env === 'development'
+  const isDev = str('NODE_ENV') === 'development'
+  const disableAuth = bool('disable_auth', false) && isDev
 
   return {
-    env,
+    isDev,
     port: str('PORT', 5000),
-    logLevel: str('LOG_LEVEL', isDevelopment ? 'debug' : 'error'),
+    logLevel: str('LOG_LEVEL', isDev ? 'debug' : 'error'),
+    disableAuth,
+    ...(disableAuth ? {} : {
+      ssoUrl: str('VL_SSO_URL'),
+      ssoKey: str('VL_SSO_KEY'),
+      ssoRedirect: isDev ? 'http://localhost:3001/' : '/',
+      requiredTeamId: num('required_team_id'),
+    }),
     knex: {
       client: 'pg',
       connection: {

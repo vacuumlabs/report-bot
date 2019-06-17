@@ -3,17 +3,22 @@ import logger from './logger'
 import config from './config'
 
 import express from 'express'
+import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import querystring from 'querystring'
 
 import {getReportsByTag} from './knex/report'
 import {getTags} from './knex/tag'
+import {authorize, registerAuthRoutes} from './auth'
 
-const app = express()
 const web = new WebClient(config.slack.appToken)
 
-// parse application/json
+const app = express()
+app.set('trust proxy', 'loopback')
+app.use(cookieParser())
 app.use(bodyParser.json())
+
+registerAuthRoutes(app)
 
 // serve CRA bundle
 const buildDir = `${__dirname}/../../client/build`
@@ -24,7 +29,7 @@ app.get('/', (req, res, next) => {
   res.sendFile(`${buildDir}/index.html`)
 })
 
-app.get('/api/tags', async (req, res) => {
+app.get('/api/tags', authorize, async (req, res) => {
   const tags = await getTags()
   res.json(tags)
 })
@@ -78,7 +83,7 @@ function normalizeEmoji(emoji) {
   return res
 }
 
-app.get('/api/reports-by-tags/:tag', async (req, res) => {
+app.get('/api/reports-by-tags/:tag', authorize, async (req, res) => {
   let reports = await getReportsByTag(req.params.tag)
   reports = await Promise.all(reports.map(async (r) => ({
     ...r,
