@@ -3,7 +3,7 @@ import { RTMClient, WebClient } from '@slack/client'
 import logger from './logger'
 import config from './config'
 
-import {connectSlack, createOnMessageListener} from './slack'
+import {connectSlack, createOnMessageListener, synchronize} from './slack'
 
 const app = async () => {
   try {
@@ -14,6 +14,9 @@ const app = async () => {
 
     // connect to Slack
     await connectSlack(rtm)
+
+    // synchronize DB with Slack
+    await synchronize(web)
 
     // attach listeners
     rtm.on('message', createOnMessageListener(web))

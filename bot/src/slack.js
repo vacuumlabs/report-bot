@@ -99,10 +99,23 @@ export const createOnMessageListener = (web) => {
       updateMessage(event)
     } else if (subtype === 'message_deleted') {
       deleteMessage(event)
+    } else if (subtype === 'channel_join') {
+      // TODO: Load old messages and add them to DB.
     } else {
       logger.warn('Unsupported type of message: %s', subtype)
     }
   }
 
   return onMessage
+}
+
+export const synchronize = async (web) => {
+  logger.info('Synchronizing DB with Slack...')
+  /**
+   * TODO:
+   * - get channel IDs, for every ID:
+   *   - load new messages,
+   *   - add these messages do DB.
+   */
+  logger.info('Successfully synchronized!')
 }
