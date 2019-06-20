@@ -13,6 +13,22 @@ export const addReport = async (report) => {
   }
 }
 
+export const addOrUpdateReport = async (report) => {
+  try {
+    await knex.raw(
+      `INSERT INTO report (ts, "user", message, permalink, channel, response_to)
+      VALUES (:ts, :user, :message, :permalink, :channel, :response_to)
+      ON CONFLICT (ts) DO
+      UPDATE SET "user" = :user, message = :message, permalink = :permalink, channel = :channel, response_to = :response_to`,
+      report
+    )
+
+    logger.debug(`Following record added/updated to/in table 'report':\n%o`, report)
+  } catch (error) {
+    logger.error(`Unable to add or update report:\n%o\ndue to following error:\n%o`, report, error)
+  }
+}
+
 export const getReportsByTag = async (tag) => {
   try {
     const reports = await knex

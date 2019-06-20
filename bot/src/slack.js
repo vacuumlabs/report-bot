@@ -1,6 +1,6 @@
 import logger from './logger'
 import config from './config'
-import {addReport, getLastChannelReportTs, removeReport, updateReport} from './knex/report'
+import {addReport, addOrUpdateReport, getLastChannelReportTs, removeReport, updateReport} from './knex/report'
 import {addTags, removeReportTags} from './knex/tag'
 
 export const connectSlack = async (rtm) => {
@@ -44,7 +44,7 @@ export const getTags = (message) => {
   return tags
 }
 
-const addMessage = async (web, event) => {
+const addMessage = async (web, event, updateOnConflict = false) => {
   const { channel, text: message, thread_ts, ts, user } = event
 
   const permalink = await getPermalink(web, channel, ts)
@@ -58,8 +58,12 @@ const addMessage = async (web, event) => {
     response_to: thread_ts || null,
   }
 
-  await addReport(report)
-
+  if (updateOnConflict) {
+    await addOrUpdateReport(report)
+  } else {
+    await addReport(report)
+  }
+  
   const tags = getTags(message)
 
   if (tags.length) {
@@ -100,7 +104,7 @@ export const createOnMessageListener = (web) => {
     } else if (subtype === 'message_deleted') {
       deleteMessage(event)
     } else if (subtype === 'channel_join') {
-      // TODO: Load old messages and add them to DB.
+      synchronizeMessages(web, event.channel)
     } else {
       logger.warn('Unsupported type of message: %s', subtype)
     }
@@ -141,10 +145,7 @@ const getBotChannelIds = async (web) => {
 }
 
 const addMessageWithReplies = async (web, channelId, message) => {
-  addMessage(web, {
-    channel: channelId,
-    ...message,
-  })
+  await addMessage(web, { channel: channelId, ...message }, true)
 
   if (message.replies) {
     for (const reply of message.replies) {
@@ -159,10 +160,7 @@ const addMessageWithReplies = async (web, channelId, message) => {
         throw new Error(result.error)
       }
 
-      addMessage(web, {
-        channel: channelId,
-        ...result.messages[0],
-      })
+      await addMessage(web, { channel: channelId, ...result.messages[0] }, true)
     }
   }
 }

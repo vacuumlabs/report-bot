@@ -3,16 +3,18 @@ import logger from '../logger'
 
 export const addTags = async (ts, tags) => {
   try {
-    const data = tags.map(tag => ({
-      report: ts,
-      tag
-    }))
+    const insertIfMissing = (tag) => knex.raw(
+      `INSERT INTO tag (report, tag)
+        SELECT :report, :tag
+        WHERE NOT EXISTS (
+          SELECT id FROM tag WHERE report = :report AND tag = :tag
+        )`,
+      { report: ts, tag }
+    )
 
-    await knex
-      .insert(data)
-      .into('tag')
+    await Promise.all(tags.map(insertIfMissing))
 
-    logger.debug(`Following tags added to table 'tag':\n%o`, data)
+    logger.debug(`Missing relations of following tags to report '%s' added to table 'tag':\n%o`, ts, tags)
   } catch (error) {
     logger.error(`Unable to add tags to table 'tag' due to following error:\n%o`, error)
   }
