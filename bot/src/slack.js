@@ -109,13 +109,59 @@ export const createOnMessageListener = (web) => {
   return onMessage
 }
 
-export const synchronize = async (web) => {
-  logger.info('Synchronizing DB with Slack...')
+const getBotChannelIds = async (web) => {
+  try {
+    const channelIds = []
+    let cursor
+    do {
+      const result = await web.users.conversations({
+        cursor,
+        limit: 999,
+        token: config.slack.botToken,
+        types: 'public_channel,private_channel',
+      })
+
+      if (!result.ok) {
+        throw new Error(result.error)
+      }
+
+      channelIds.push(...result.channels.map(channel => channel.id))
+      cursor = result.response_metadata.next_cursor
+    }
+    while (cursor)
+
+    return channelIds
+  } catch(error) {
+    logger.error('Unable to get Bot channels due to following error ' +
+      '(for more information see https://api.slack.com/methods/users.conversations):\n' +
+      error
+    )
+    return null
+  }
+}
+
+const synchronizeMessages = async (web, channelId, fromTs = 0) => {
   /**
    * TODO:
-   * - get channel IDs, for every ID:
-   *   - load new messages,
-   *   - add these messages do DB.
+   * - load new messages from Slack,
+   * - add these messages do DB.
    */
+}
+
+export const synchronize = async (web) => {
+  logger.info('Synchronizing DB with Slack...')
+
+  const channelIds = await getBotChannelIds(web)
+
+  if (channelIds === null) {
+    logger.warn('Synchronization failed!')
+    return
+  }
+
+  for (const channelId of channelIds) {
+    const latestTs = 0 // TODO: load last message ts from DB
+    await synchronizeMessages(web, channelId, latestTs)
+  }
+  
   logger.info('Successfully synchronized!')
 }
