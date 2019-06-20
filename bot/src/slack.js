@@ -141,11 +141,42 @@ const getBotChannelIds = async (web) => {
 }
 
 const synchronizeMessages = async (web, channelId, fromTs = 0) => {
-  /**
-   * TODO:
-   * - load new messages from Slack,
-   * - add these messages do DB.
-   */
+  try {
+    let oldest = fromTs
+    let hasMore
+
+    do {
+      const result = await web.conversations.history({
+        channel: channelId,
+        oldest,
+        limit: 200,
+        token: config.slack.appToken,
+      })
+
+      if (!result.ok) {
+        throw new Error(result.error)
+      }
+
+      for (const message of result.messages) {
+        // TODO: Add these messages do DB.
+      }
+
+      hasMore = result.has_more
+
+      if (hasMore) {
+        oldest = result.messages[0].ts
+      }
+    }
+    while (hasMore)
+  } catch(error) {
+    logger.error('Unable to get channel history due to following error ' +
+      '(for more information see https://api.slack.com/methods/conversations.history):\n' +
+      error
+    )
+    return
+  }
+
+  logger.debug(`Channel with ID ${channelId} successfully synchronized.`)
 }
 
 export const synchronize = async (web) => {
