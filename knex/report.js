@@ -66,3 +66,19 @@ export const updateReport = async (ts, data) => {
     logger.error(`Following error occurred during update report with TS '%s':\n%o`, ts, error)
   }
 }
+
+export const getLastChannelReportTs = async (channelId) => {
+  try {
+    const report = await knex('report')
+      .select('ts')
+      .from('report')
+      .where('channel', channelId)
+      .orderBy('ts', 'desc')
+      .limit(1)
+      .first()
+
+    return report ? report.ts : 0
+  } catch (error) {
+    logger.error(`Following error occurred during retrieving the latest report in channel '%s':\n%o`, channelId, error)
+  }
+}

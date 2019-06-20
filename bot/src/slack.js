@@ -1,6 +1,6 @@
 import logger from './logger'
 import config from './config'
-import {addReport, removeReport, updateReport} from './knex/report'
+import {addReport, getLastChannelReportTs, removeReport, updateReport} from './knex/report'
 import {addTags, removeReportTags} from './knex/tag'
 
 export const connectSlack = async (rtm) => {
@@ -159,7 +159,7 @@ export const synchronize = async (web) => {
   }
 
   for (const channelId of channelIds) {
-    const latestTs = 0 // TODO: load last message ts from DB
+    const latestTs = await getLastChannelReportTs(channelId)
     await synchronizeMessages(web, channelId, latestTs)
   }
   
