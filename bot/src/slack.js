@@ -140,6 +140,33 @@ const getBotChannelIds = async (web) => {
   }
 }
 
+const addMessageWithReplies = async (web, channelId, message) => {
+  addMessage(web, {
+    channel: channelId,
+    ...message,
+  })
+
+  if (message.replies) {
+    for (const reply of message.replies) {
+      const result = await web.conversations.replies({
+        channel: channelId,
+        limit: 1,
+        ts: reply.ts,
+        token: config.slack.appToken,
+      })
+
+      if (!result.ok) {
+        throw new Error(result.error)
+      }
+
+      addMessage(web, {
+        channel: channelId,
+        ...result.messages[0],
+      })
+    }
+  }
+}
+
 const synchronizeMessages = async (web, channelId, fromTs = 0) => {
   try {
     let oldest = fromTs
@@ -158,7 +185,9 @@ const synchronizeMessages = async (web, channelId, fromTs = 0) => {
       }
 
       for (const message of result.messages) {
-        // TODO: Add these messages do DB.
+        if (!message.subtype) {
+          await addMessageWithReplies(web, channelId, message)
+        }
       }
 
       hasMore = result.has_more
