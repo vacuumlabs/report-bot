@@ -148,7 +148,7 @@ const addMessageWithReplies = async (web, channelId, message) => {
   await addMessage(web, { channel: channelId, ...message }, true)
 
   if (message.replies) {
-    for (const reply of message.replies) {
+    await Promise.all(message.replies.map(async (reply) => {
       const result = await web.conversations.replies({
         channel: channelId,
         limit: 1,
@@ -161,7 +161,7 @@ const addMessageWithReplies = async (web, channelId, message) => {
       }
 
       await addMessage(web, { channel: channelId, ...result.messages[0] }, true)
-    }
+    }))
   }
 }
 
@@ -182,11 +182,11 @@ const synchronizeMessages = async (web, channelId, fromTs = 0) => {
         throw new Error(result.error)
       }
 
-      for (const message of result.messages) {
+      await Promise.all(result.messages.map(async (message) => {
         if (!message.subtype) {
           await addMessageWithReplies(web, channelId, message)
         }
-      }
+      }))
 
       hasMore = result.has_more
 
