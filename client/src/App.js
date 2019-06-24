@@ -1,39 +1,19 @@
 import React, { Component } from 'react'
+import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import LeftPanel from './components/leftPanel/LeftPanel'
-import TopPanel from './components/topPanel/TopPanel'
-import MessageList from './components/message/MessageList'
-import { getReportsByTag } from './utils/serverApi'
+import Content from './components/content/Content'
 import './App.scss'
 
 class App extends Component {
-  state = {
-    emoji: {},
-    reports: [],
-    selectedTag: null,
-  }
-
-  handleSelectTag = async (tag) => {
-    const {reports, users, emoji, channels} = await getReportsByTag(tag)
-
-    this.setState({
-      selectedTag: tag,
-      reports,
-      users,
-      emoji,
-      channels,
-    })
-  }
-
   render() {
-    const {emoji, reports, users, channels, selectedTag} = this.state
-
     return (
       <div className="container">
-        <LeftPanel onSelectTag={this.handleSelectTag} />
-        <div className="content">
-          <TopPanel selectedTag={selectedTag} customEmojis={emoji} />
-          <MessageList reports={reports} users={users} channels={channels} customEmojis={emoji} />
-        </div>  
+        <BrowserRouter>
+          <LeftPanel />
+          <Switch>
+            <Route exact path="/:tag" component={Content} />
+          </Switch>
+        </BrowserRouter>
       </div>
     )
   }
