@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import TopPanel from '../topPanel/TopPanel'
 import MessageList from '../message/MessageList'
+import { Loader } from '../ui'
 import { getReportsByTag } from '../../utils/serverApi'
 import './Content.scss'
 
@@ -8,7 +9,7 @@ class Content extends Component {
   state = {
     emoji: {},
     reports: [],
-    selectedTag: null,
+    loading: true,
   }
 
   componentWillReceiveProps(nextProps) {
@@ -20,8 +21,13 @@ class Content extends Component {
   }
 
   createState = async (props = this.props) => {
+    this.setState({
+      loading: true
+    })
+
     const { tag } = props.match.params
-    const selectedTag = decodeURI(tag)
+    let selectedTag = tag || props.defaultTag
+    selectedTag = selectedTag ? decodeURI(selectedTag) : selectedTag
 
     const {reports, users, emoji, channels} = await getReportsByTag(selectedTag)
     
@@ -31,16 +37,31 @@ class Content extends Component {
       emoji,
       channels,
       selectedTag,
+      loading: props.loading,
     })
   }
 
   render() {
-    const {emoji, reports, users, channels, selectedTag} = this.state
+    const {emoji, reports, users, channels, selectedTag, loading} = this.state
 
     return (
       <div className="Content">
-        <TopPanel selectedTag={selectedTag} customEmojis={emoji} />
-        <MessageList reports={reports} users={users} channels={channels} customEmojis={emoji} />
+        {loading && 
+          <div className="info">
+            <Loader />
+          </div>
+        }
+        {!loading && !selectedTag &&
+          <div className="info">
+            No messages.
+          </div>
+        }
+        {!loading && selectedTag &&
+          <>
+            <TopPanel selectedTag={selectedTag} customEmojis={emoji} />
+            <MessageList reports={reports} users={users} channels={channels} customEmojis={emoji} />
+          </>
+        }
       </div>
     )
   }
