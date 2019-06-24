@@ -1,18 +1,16 @@
 import React, { Component } from 'react'
+import {Link as RouterLink} from 'react-router-dom'
 import './Tag.scss'
 
 class Tag extends Component {
-  handleClick = () => {
-    const { tag: { tag }, onClick } = this.props
-    onClick(tag)
-  }
-
   render() {
-    const { dataLoading, tag: { tag, count } } = this.props
+    const {tag, count} = this.props.tag
 
     return (
       <li>
-        <button disabled={dataLoading} onClick={this.handleClick}>{tag} ({count})</button>
+        <RouterLink className={'tagLink'} to={`/${encodeURI(tag)}`}>
+          {tag} ({count})
+        </RouterLink>
       </li>
     )
   }

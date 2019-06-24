@@ -1,50 +1,40 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
+import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom'
+
+import {getTags} from './utils/serverApi'
 import LeftPanel from './components/leftPanel/LeftPanel'
-import TopPanel from './components/topPanel/TopPanel'
-import MessageList from './components/message/MessageList'
-import { getReportsByTag } from './utils/serverApi'
-import { Loader } from './components/ui'
+import Content from './components/content/Content'
+import {Loader} from './components/ui'
 import './App.scss'
 
 class App extends Component {
-  state = {
-    emoji: {},
-    reports: [],
-    selectedTag: null,
-    loading: false,
-  }
+  state = {}
 
-  handleSelectTag = async (tag) => {
-    this.setState({
-      loading: true,
-      selectedTag: tag,
-    })
-
-    const {reports, users, emoji, channels} = await getReportsByTag(tag)
-
-    this.setState({
-      selectedTag: tag,
-      reports,
-      users,
-      emoji,
-      channels,
-      loading: false,
-    })
+  async componentDidMount() {
+    const tags = await getTags()
+    this.setState({tags})
   }
 
   render() {
-    const {emoji, reports, users, channels, selectedTag, loading} = this.state
+    const {tags} = this.state
+    const loading = tags === undefined
 
     return (
       <div className="container">
-        <LeftPanel onSelectTag={this.handleSelectTag} dataLoading={loading} />
-        <div className="content">
-          <TopPanel selectedTag={selectedTag} customEmojis={emoji} />
-          {
-            loading ? <Loader/>:
-            <MessageList reports={reports} users={users} channels={channels} customEmojis={emoji} />
-          }
-        </div>  
+        {loading && <Loader light />}
+        {!loading && tags.length === 0 && <div className="info">No tags found.</div>}
+        {!loading && tags.length > 0 && <BrowserRouter>
+          <LeftPanel tags={tags} />
+          <Switch>
+            <Redirect exact from='/' to={`/${encodeURI(tags[0].tag)}`} />
+            <Route exact path='/:tag' component={(props) => {
+              const tag = decodeURI(props.match.params.tag)
+              return tags.some((t) => t.tag === tag)
+                ? (<Content key={tag} tag={tag} />)
+                : (<div className="info">Unknown tag.</div>)
+            }} />
+          </Switch>
+        </BrowserRouter>}
       </div>
     )
   }
