@@ -1,4 +1,4 @@
-button {
+.tagLink {
   font-family: 'Lato', sans-serif;
   font-size: 16px;
   border: 0;
@@ -10,15 +10,16 @@ button {
   color: #fff;
   text-align: left;
   transition: 250ms;
+  text-decoration: none;
 }
 
-button:hover,
-button:focus {
+.tagLink:hover,
+.tagLink:focus {
   background-color: #4B5967;
   outline: none;
 }
 
-button:disabled {
+.tagLink:disabled {
   opacity: 0.6;
   cursor: default;
 }
