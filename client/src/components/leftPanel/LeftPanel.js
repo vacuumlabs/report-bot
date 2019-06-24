@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import vacuumLogo from '../../assets/vacuum-logo-light.svg'
 import config from '../../config'
-import { getTags } from '../../utils/serverApi'
 import { Loader } from '../ui'
 import Tag from './Tag'
 import './LeftPanel.scss'
@@ -9,17 +8,12 @@ import './LeftPanel.scss'
 class LeftPanel extends Component {
   state = {
     allVisible: true,
-    loading: true,
-    tags: [],
   }
 
-  async componentDidMount() {
-    const tags = await getTags()
-
+  componentWillReceiveProps(nextProps) {
+    const { tags } = nextProps
     this.setState({
       allVisible: tags.length <= config.tagCountLimit,
-      loading: false,
-      tags,
     })
   }
 
@@ -28,7 +22,8 @@ class LeftPanel extends Component {
   }
 
   render() {
-    const { allVisible, loading, tags } = this.state
+    const { loading, tags } = this.props
+    const { allVisible } = this.state
     const tagsToShow = allVisible ? tags : tags.slice(0, config.tagCountLimit)
 
     return (
@@ -38,14 +33,13 @@ class LeftPanel extends Component {
         </a>
         <strong className="sectionTitle">Select tag</strong>
         { loading && <Loader light /> }
-        {
-          !loading && <ul>
-            {tagsToShow.map(tag => 
-              (<Tag key={tag.tag} tag={tag} />)
-            )}
-          </ul>
-        }
-        { !loading && !allVisible && <button type="button" className="showAll" onClick={this.toggleAllVisible}>Show all</button>}
+        { !loading && !tagsToShow.length && <span className="noTags">No tags found.</span>}
+        <ul>
+          {tagsToShow.map(tag => 
+            (<Tag key={tag.tag} tag={tag} />)
+          )}
+        </ul>
+        { !allVisible && <button type="button" className="showAll" onClick={this.toggleAllVisible}>Show all</button>}
       </div>
     )
   }
