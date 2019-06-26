@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import parse from '../../parseSlack'
 import { Emoji, Link } from '../ui'
-import { getChannelLink } from '../../utils/slackRoutes'
-import UserLink from './UserLink'
+import { getChannelLink, getUserLink } from '../../utils/slackRoutes'
 import './MessageContent.scss'
 
 function Style({formatting, children}) {
@@ -39,7 +38,11 @@ class MessageContent extends Component {
       vspace: (node, k) => rich ? <span className="vspace" key={k}></span> : '',
       code: ({text}, k) => rich ? <code key={k}>{text}</code> : text,
       emoji: ({id}, k) => <Emoji name={id} customEmojis={customEmojis} key={k}/>,
-      user: ({id}, k) => rich ? <UserLink user={users[id]} key={k}/> : users[id].display_name,
+      user({id}, k) {
+        const { display_name, real_name } = users[id]
+        const userName = display_name || real_name
+        return rich ? <Link className="userLink" to={getUserLink(id)} key={k}>@{userName}</Link> : userName
+      },
       channel: ({id, name}, k) => rich ? <Link to={getChannelLink(id)} key={k}>#{name}</Link> : name,
       url: ({id, name}, k) => rich ? <Link to={id} key={k}>{name}</Link> : name,
       span: ({children, style}, k) => <Style key={k} formatting={style}>{r(children)}</Style>,
