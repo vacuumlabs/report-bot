@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import parse from '../../parseSlack'
 import { Emoji, Link } from '../ui'
-import ChannelLink from './ChannelLink'
+import { getChannelLink } from '../../utils/slackRoutes'
 import UserLink from './UserLink'
 import './MessageContent.scss'
 
@@ -40,7 +40,7 @@ class MessageContent extends Component {
       code: ({text}, k) => rich ? <code key={k}>{text}</code> : text,
       emoji: ({id}, k) => <Emoji name={id} customEmojis={customEmojis} key={k}/>,
       user: ({id}, k) => rich ? <UserLink user={users[id]} key={k}/> : users[id].display_name,
-      channel: ({id, name}, k) => rich ? <ChannelLink channelId={id} channelName={name} key={k}/> : name,
+      channel: ({id, name}, k) => rich ? <Link to={getChannelLink(id)} key={k}>#{name}</Link> : name,
       url: ({id, name}, k) => rich ? <Link to={id} key={k}>{name}</Link> : name,
       span: ({children, style}, k) => <Style key={k} formatting={style}>{r(children)}</Style>,
     }
