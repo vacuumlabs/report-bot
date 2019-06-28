@@ -46,7 +46,6 @@ export const getPermalink = async (channel, ts) => {
   try {
     const { permalink } = await web.chat.getPermalink({
       channel,
-      token: config.slack.botToken,
       message_ts: ts,
     })
   
@@ -126,7 +125,6 @@ const getBotChannelIds = async () => {
       const result = await web.users.conversations({
         cursor,
         limit: 999,
-        token: config.slack.botToken,
         types: 'public_channel,private_channel',
       })
 
