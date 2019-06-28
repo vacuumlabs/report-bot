@@ -1,9 +1,36 @@
+import { RTMClient } from '@slack/rtm-api'
+import { WebClient } from '@slack/web-api'
 import logger from './logger'
 import config from './config'
 import {addReport, addOrUpdateReport, getLastChannelReportTs, removeReport, updateReport} from './knex/report'
 import {addTags, removeReportTags} from './knex/tag'
 
-export const connectSlack = async (rtm) => {
+// clients initialization
+const {botToken} = config.slack
+const rtm = new RTMClient(botToken)
+const web = new WebClient(botToken)
+
+export const attachMessageListener = () => {
+  rtm.on('message', async (event) => {
+    logger.debug('Received following message:\n%o', event)
+
+    const { subtype } = event
+
+    if (!subtype) {
+      await addMessage(event)
+    } else if (subtype === 'message_changed') {
+      updateMessage(event)
+    } else if (subtype === 'message_deleted') {
+      deleteMessage(event)
+    } else if (subtype === 'channel_join') {
+      synchronizeMessages(event.channel)
+    } else {
+      logger.warn('Unsupported type of message: %s', subtype)
+    }
+  })
+}
+
+export const connectSlack = async () => {
   try {
     await rtm.start()
     logger.info('Successfully connected to Slack!')
@@ -15,7 +42,7 @@ export const connectSlack = async (rtm) => {
   }
 }
 
-export const getPermalink = async (web, channel, ts) => {
+export const getPermalink = async (channel, ts) => {
   try {
     const { permalink } = await web.chat.getPermalink({
       channel,
@@ -44,10 +71,10 @@ export const getTags = (message) => {
   return tags
 }
 
-const addMessage = async (web, event, updateOnConflict = false) => {
+const addMessage = async (event, updateOnConflict = false) => {
   const { channel, text: message, thread_ts, ts, user } = event
 
-  const permalink = await getPermalink(web, channel, ts)
+  const permalink = await getPermalink(channel, ts)
 
   const report = {
     ts,
@@ -91,29 +118,7 @@ const deleteMessage = async (event) => {
   await removeReportTags(ts)
 }
 
-export const createOnMessageListener = (web) => {
-  const onMessage = async (event) => {
-    logger.debug('Received following message:\n%o', event)
-
-    const { subtype } = event
-
-    if (!subtype) {
-      await addMessage(web, event)
-    } else if (subtype === 'message_changed') {
-      updateMessage(event)
-    } else if (subtype === 'message_deleted') {
-      deleteMessage(event)
-    } else if (subtype === 'channel_join') {
-      synchronizeMessages(web, event.channel)
-    } else {
-      logger.warn('Unsupported type of message: %s', subtype)
-    }
-  }
-
-  return onMessage
-}
-
-const getBotChannelIds = async (web) => {
+const getBotChannelIds = async () => {
   try {
     const channelIds = []
     let cursor
@@ -144,8 +149,8 @@ const getBotChannelIds = async (web) => {
   }
 }
 
-const addMessageWithReplies = async (web, channelId, message) => {
-  await addMessage(web, { channel: channelId, ...message }, true)
+const addMessageWithReplies = async (channelId, message) => {
+  await addMessage({ channel: channelId, ...message }, true)
 
   if (message.replies) {
     await Promise.all(message.replies.map(async (reply) => {
@@ -160,12 +165,12 @@ const addMessageWithReplies = async (web, channelId, message) => {
         throw new Error(result.error)
       }
 
-      await addMessage(web, { channel: channelId, ...result.messages[0] }, true)
+      await addMessage({ channel: channelId, ...result.messages[0] }, true)
     }))
   }
 }
 
-const synchronizeMessages = async (web, channelId, fromTs = 0) => {
+const synchronizeMessages = async (channelId, fromTs = 0) => {
   try {
     let oldest = fromTs
     let hasMore
@@ -184,7 +189,7 @@ const synchronizeMessages = async (web, channelId, fromTs = 0) => {
 
       await Promise.all(result.messages.map(async (message) => {
         if (!message.subtype) {
-          await addMessageWithReplies(web, channelId, message)
+          await addMessageWithReplies(channelId, message)
         }
       }))
 
@@ -206,10 +211,10 @@ const synchronizeMessages = async (web, channelId, fromTs = 0) => {
   logger.debug(`Channel with ID ${channelId} successfully synchronized.`)
 }
 
-export const synchronize = async (web) => {
+export const synchronize = async () => {
   logger.info('Synchronizing DB with Slack...')
 
-  const channelIds = await getBotChannelIds(web)
+  const channelIds = await getBotChannelIds()
 
   if (channelIds === null) {
     logger.warn('Synchronization failed!')
@@ -218,7 +223,7 @@ export const synchronize = async (web) => {
 
   for (const channelId of channelIds) {
     const latestTs = await getLastChannelReportTs(channelId)
-    await synchronizeMessages(web, channelId, latestTs)
+    await synchronizeMessages(channelId, latestTs)
   }
   
   logger.info('Successfully synchronized!')
