@@ -83,18 +83,21 @@ export const updateReport = async (ts, data) => {
   }
 }
 
-export const getLastChannelReportTs = async (channelId) => {
+export const getChannelsLastTs = async () => {
   try {
-    const report = await knex('report')
-      .select('ts')
+    const lastTimestamps = await knex('report')
+      .select('channel', knex.raw('MAX(ts) AS ts'))
       .from('report')
-      .where('channel', channelId)
-      .orderBy('ts', 'desc')
-      .limit(1)
-      .first()
+      .groupBy('channel')
+    
+    const result = new Map()
 
-    return report ? report.ts : 0
+    if (lastTimestamps) {
+      lastTimestamps.map((item) => result.set(item.channel, item.ts))
+    }
+
+    return result
   } catch (error) {
-    logger.error(`Following error occurred during retrieving the latest report in channel '%s':\n%o`, channelId, error)
+    logger.error(`Following error occurred during retrieving the latest report of channels:\n%o`, error)
   }
 }

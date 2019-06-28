@@ -2,7 +2,7 @@ import { RTMClient } from '@slack/rtm-api'
 import { WebClient } from '@slack/web-api'
 import logger from './logger'
 import config from './config'
-import {addReport, addOrUpdateReport, getLastChannelReportTs, removeReport, updateReport} from './knex/report'
+import {addReport, addOrUpdateReport, getChannelsLastTs, removeReport, updateReport} from './knex/report'
 import {addTags, removeReportTags} from './knex/tag'
 
 // clients initialization
@@ -172,10 +172,11 @@ export const synchronize = async () => {
   logger.info('Synchronizing DB with Slack...')
 
   try {
+    const channelsLastTs = await getChannelsLastTs()
     const channelIds = await getBotChannelIds()
 
     for (const channelId of channelIds) {
-      const latestTs = await getLastChannelReportTs(channelId)
+      const latestTs = channelsLastTs.get(channelId) || 0
       await synchronizeMessages(channelId, latestTs)
     }
 
