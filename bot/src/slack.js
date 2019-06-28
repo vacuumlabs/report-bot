@@ -31,33 +31,17 @@ export const attachMessageListener = () => {
 }
 
 export const connectSlack = async () => {
-  try {
-    await rtm.start()
-    logger.info('Successfully connected to Slack!')
-  } catch(error) {
-    throw new Error('Unable connect to Slack due to the following error ' +
-      '(for more information see https://api.slack.com/methods/rtm.start):\n' + 
-      error
-    )
-  }
+  await rtm.start()
+  logger.info('Successfully connected to Slack!')
 }
 
 export const getPermalink = async (channel, ts) => {
-  try {
-    const { permalink } = await web.chat.getPermalink({
-      channel,
-      message_ts: ts,
-    })
-  
-    return permalink
-  } catch(error) {
-    logger.error('Unable to get permalink of message due to following error ' +
-      '(for more information see https://api.slack.com/methods/chat.getPermalink):\n' +
-      error
-    )
+  const { permalink } = await web.chat.getPermalink({
+    channel,
+    message_ts: ts,
+  })
 
-    return null
-  }
+  return permalink
 }
 
 export const getTags = (message) => {
@@ -118,24 +102,16 @@ const deleteMessage = async (event) => {
 }
 
 const getBotChannelIds = async () => {
-  try {
-    const channelIds = []
+  const channelIds = []
 
-    for await (const page of web.paginate('users.conversations', { types: 'public_channel,private_channel' })) {
-      if (!page.ok) {
-        throw new Error(page.error)
-      }
-      channelIds.push(...page.channels.map(channel => channel.id))
+  for await (const page of web.paginate('users.conversations', { types: 'public_channel,private_channel' })) {
+    if (!page.ok) {
+      throw new Error(page.error)
     }
-    
-    return channelIds
-  } catch(error) {
-    logger.error('Unable to get Bot channels due to following error ' +
-      '(for more information see https://api.slack.com/methods/users.conversations):\n' +
-      error
-    )
-    return null
+    channelIds.push(...page.channels.map(channel => channel.id))
   }
+  
+  return channelIds
 }
 
 const addMessageWithReplies = async (channelId, message) => {
@@ -160,42 +136,34 @@ const addMessageWithReplies = async (channelId, message) => {
 }
 
 const synchronizeMessages = async (channelId, fromTs = 0) => {
-  try {
-    let oldest = fromTs
-    let hasMore
+  let oldest = fromTs
+  let hasMore
 
-    do {
-      const result = await web.conversations.history({
-        channel: channelId,
-        oldest,
-        limit: 200,
-        token: config.slack.appToken,
-      })
+  do {
+    const result = await web.conversations.history({
+      channel: channelId,
+      oldest,
+      limit: 200,
+      token: config.slack.appToken,
+    })
 
-      if (!result.ok) {
-        throw new Error(result.error)
-      }
-
-      await Promise.all(result.messages.map(async (message) => {
-        if (!message.subtype) {
-          await addMessageWithReplies(channelId, message)
-        }
-      }))
-
-      hasMore = result.has_more
-
-      if (hasMore) {
-        oldest = result.messages[0].ts
-      }
+    if (!result.ok) {
+      throw new Error(result.error)
     }
-    while (hasMore)
-  } catch(error) {
-    logger.error('Unable to get channel history due to following error ' +
-      '(for more information see https://api.slack.com/methods/conversations.history):\n' +
-      error
-    )
-    return
+
+    await Promise.all(result.messages.map(async (message) => {
+      if (!message.subtype) {
+        await addMessageWithReplies(channelId, message)
+      }
+    }))
+
+    hasMore = result.has_more
+
+    if (hasMore) {
+      oldest = result.messages[0].ts
+    }
   }
+  while (hasMore)
 
   logger.debug(`Channel with ID ${channelId} successfully synchronized.`)
 }
@@ -203,17 +171,16 @@ const synchronizeMessages = async (channelId, fromTs = 0) => {
 export const synchronize = async () => {
   logger.info('Synchronizing DB with Slack...')
 
-  const channelIds = await getBotChannelIds()
+  try {
+    const channelIds = await getBotChannelIds()
 
-  if (channelIds === null) {
-    logger.warn('Synchronization failed!')
-    return
-  }
+    for (const channelId of channelIds) {
+      const latestTs = await getLastChannelReportTs(channelId)
+      await synchronizeMessages(channelId, latestTs)
+    }
 
-  for (const channelId of channelIds) {
-    const latestTs = await getLastChannelReportTs(channelId)
-    await synchronizeMessages(channelId, latestTs)
+    logger.info('Successfully synchronized!')
+  } catch(error) {
+    logger.warn('Synchronization failed due to the following error:\n' + error)
   }
-  
-  logger.info('Successfully synchronized!')
 }
