@@ -120,23 +120,14 @@ const deleteMessage = async (event) => {
 const getBotChannelIds = async () => {
   try {
     const channelIds = []
-    let cursor
-    do {
-      const result = await web.users.conversations({
-        cursor,
-        limit: 999,
-        types: 'public_channel,private_channel',
-      })
 
-      if (!result.ok) {
-        throw new Error(result.error)
+    for await (const page of web.paginate('users.conversations', { types: 'public_channel,private_channel' })) {
+      if (!page.ok) {
+        throw new Error(page.error)
       }
-
-      channelIds.push(...result.channels.map(channel => channel.id))
-      cursor = result.response_metadata.next_cursor
+      channelIds.push(...page.channels.map(channel => channel.id))
     }
-    while (cursor)
-
+    
     return channelIds
   } catch(error) {
     logger.error('Unable to get Bot channels due to following error ' +
