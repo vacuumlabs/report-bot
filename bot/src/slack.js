@@ -1,12 +1,21 @@
+import {RTMClient} from '@slack/rtm-api'
+import {WebClient} from '@slack/web-api'
 import logger from './logger'
 import config from './config'
 import {addReport, removeReport, updateReport} from './knex/report'
 import {addTags, removeReportTags} from './knex/tag'
 
-export const connectSlack = async (rtm) => {
+const {botToken} = config.slack
+const rtm = new RTMClient(botToken)
+const web = new WebClient(botToken)
+
+export const connectSlack = async () => {
   try {
     await rtm.start()
     logger.info('Successfully connected to Slack!')
+
+    // attach listeners
+    rtm.on('message', createOnMessageListener())
   } catch(error) {
     throw new Error('Unable connect to Slack due to the following error ' +
       '(for more information see https://api.slack.com/methods/rtm.start):\n' + 
@@ -15,7 +24,7 @@ export const connectSlack = async (rtm) => {
   }
 }
 
-export const getPermalink = async (web, channel, ts) => {
+export const getPermalink = async (channel, ts) => {
   try {
     const { permalink } = await web.chat.getPermalink({
       channel,
@@ -44,10 +53,10 @@ export const getTags = (message) => {
   return tags
 }
 
-const addMessage = async (web, event) => {
+const addMessage = async (event) => {
   const { channel, text: message, thread_ts, ts, user } = event
 
-  const permalink = await getPermalink(web, channel, ts)
+  const permalink = await getPermalink(channel, ts)
 
   const report = {
     ts,
@@ -87,14 +96,14 @@ const deleteMessage = async (event) => {
   await removeReportTags(ts)
 }
 
-export const createOnMessageListener = (web) => {
+export const createOnMessageListener = () => {
   const onMessage = async (event) => {
     logger.debug('Received following message:\n%o', event)
 
     const { subtype } = event
 
     if (!subtype) {
-      await addMessage(web, event)
+      await addMessage(event)
     } else if (subtype === 'message_changed') {
       updateMessage(event)
     } else if (subtype === 'message_deleted') {

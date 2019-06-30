@@ -1,24 +1,12 @@
 import http from 'http'
-import {RTMClient} from '@slack/rtm-api'
-import {WebClient} from '@slack/web-api'
 import logger from './logger'
 import config from './config'
 
-import {connectSlack, createOnMessageListener} from './slack'
+import {connectSlack} from './slack'
 
 const app = async () => {
   try {
-    // initialization
-    const {botToken} = config.slack
-    const rtm = new RTMClient(botToken)
-    const web = new WebClient(botToken)
-
-    // connect to Slack
-    await connectSlack(rtm)
-
-    // attach listeners
-    rtm.on('message', createOnMessageListener(web))
-
+    await connectSlack()
   } catch(error) {
     logger.error(error)
   }
