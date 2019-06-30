@@ -5,6 +5,7 @@
   "author": "Tomas Fabry <tomas.fabry@vacuumlabs.com>",
   "license": "Unlicense",
   "scripts": {
+    "knex": "knex --knexfile knex/knexfile.js",
     "build": "yarn --cwd client && yarn --cwd client build && yarn --cwd server && yarn --cwd server build",
     "clean": "rimraf node_modules && yarn --cwd client clean && yarn --cwd server clean",
     "client": "yarn --cwd client start",
@@ -13,6 +14,9 @@
     "dev": "concurrently \"yarn server\" \"yarn client\""
   },
   "devDependencies": {
-    "concurrently": "^4.1.0"
+    "concurrently": "^4.1.0",
+    "knex": "^0.18.1",
+    "pg": "^7.11.0",
+    "transenv": "^1.0.3"
   }
 }

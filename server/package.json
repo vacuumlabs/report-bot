@@ -10,7 +10,6 @@
     "clean": "rimraf dist && rimraf node_modules",
     "start:dev": "yarn build && yarn start",
     "dev": "nodemon --watch src --exec yarn start:dev",
-    "knex": "knex --knexfile src/knex/knexfile.js",
     "eslint": "eslint src",
     "build": "babel src -d dist",
     "start": "node -- dist/index.js"
