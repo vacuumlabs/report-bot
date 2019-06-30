@@ -2,8 +2,7 @@ import {RTMClient} from '@slack/rtm-api'
 import {WebClient} from '@slack/web-api'
 import logger from './logger'
 import config from './config'
-import {addReport, removeReport, updateReport} from './knex/report'
-import {addTags, removeReportTags} from './knex/tag'
+import {upsertReport, deleteReport, setTags, clearTags} from './db'
 
 const {botToken} = config.slack
 const rtm = new RTMClient(botToken)
@@ -49,33 +48,33 @@ const addMessage = async (event) => {
     response_to: thread_ts || null,
   }
 
-  await addReport(report)
+  await upsertReport(report)
 
   const tags = getTags(message)
 
   if (tags.length) {
-    await addTags(ts, tags)
+    await setTags(ts, tags)
   }
 }
 
 const updateMessage = async (event) => {
   const { message: { text: message, ts } } = event
 
-  await updateReport(ts, { message })
-  await removeReportTags(ts)
+  await upsertReport({ts, message})
+  await clearTags(ts)
 
   const tags = getTags(message)
 
   if (tags.length) {
-    await addTags(ts, tags)
+    await setTags(ts, tags)
   }
 }
 
 const deleteMessage = async (event) => {
   const { deleted_ts: ts } = event
 
-  await removeReport(ts)
-  await removeReportTags(ts)
+  await deleteReport(ts)
+  await clearTags(ts)
 }
 
 const createOnMessageListener = () => {
