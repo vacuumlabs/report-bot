@@ -17,7 +17,7 @@ export const connectSlack = async () => {
   rtm.on('message', createOnMessageListener())
 }
 
-export const getPermalink = async (channel, ts) => {
+const getPermalink = async (channel, ts) => {
   const { permalink } = await web.chat.getPermalink({
     channel,
     message_ts: ts,
@@ -25,7 +25,7 @@ export const getPermalink = async (channel, ts) => {
   return permalink
 }
 
-export const getTags = (message) => {
+const getTags = (message) => {
   const tagRegexPattern = /:__\w+:/g
   const matches = message.match(tagRegexPattern)
   const tags = matches ? matches.map(item => item.substring(3, item.length - 1)) : []
@@ -78,7 +78,7 @@ const deleteMessage = async (event) => {
   await removeReportTags(ts)
 }
 
-export const createOnMessageListener = () => {
+const createOnMessageListener = () => {
   const onMessage = async (event) => {
     logger.debug('Received following message:\n%o', event)
 
