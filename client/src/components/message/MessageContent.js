@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import parse from '../../parseSlack'
 import { Emoji, Link } from '../ui'
-import ChannelLink from './ChannelLink'
-import UserLink from './UserLink'
+import * as routes from '../../routes'
+
 import './MessageContent.scss'
 
 function Style({formatting, children}) {
@@ -39,8 +39,15 @@ class MessageContent extends Component {
       vspace: (node, k) => rich ? <span className="vspace" key={k}></span> : '',
       code: ({text}, k) => rich ? <code key={k}>{text}</code> : text,
       emoji: ({id}, k) => <Emoji name={id} customEmojis={customEmojis} key={k}/>,
-      user: ({id}, k) => rich ? <UserLink user={users[id]} key={k}/> : users[id].display_name,
-      channel: ({id, name}, k) => rich ? <ChannelLink channelId={id} channelName={name} key={k}/> : name,
+      user: ({id}, k) => {
+        const name = `@${users[id].display_name}`
+        return rich
+          ? <Link className="userLink" to={routes.user(id)} key={k}>{name}</Link>
+          : name
+      },
+      channel: ({id, name}, k) => rich
+        ? <Link to={routes.channel(id)} channelName={name} key={k}>#{name}</Link>
+        : name,
       url: ({id, name}, k) => rich ? <Link to={id} key={k}>{name}</Link> : name,
       span: ({children, style}, k) => <Style key={k} formatting={style}>{r(children)}</Style>,
     }
