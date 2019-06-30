@@ -10,36 +10,19 @@ const rtm = new RTMClient(botToken)
 const web = new WebClient(botToken)
 
 export const connectSlack = async () => {
-  try {
-    await rtm.start()
-    logger.info('Successfully connected to Slack!')
+  await rtm.start()
+  logger.info('Successfully connected to Slack!')
 
-    // attach listeners
-    rtm.on('message', createOnMessageListener())
-  } catch(error) {
-    throw new Error('Unable connect to Slack due to the following error ' +
-      '(for more information see https://api.slack.com/methods/rtm.start):\n' + 
-      error
-    )
-  }
+  // attach listeners
+  rtm.on('message', createOnMessageListener())
 }
 
 export const getPermalink = async (channel, ts) => {
-  try {
-    const { permalink } = await web.chat.getPermalink({
-      channel,
-      message_ts: ts,
-    })
-  
-    return permalink
-  } catch(error) {
-    logger.error('Unable to get permalink of message due to following error ' +
-      '(for more information see https://api.slack.com/methods/chat.getPermalink):\n' +
-      error
-    )
-
-    return null
-  }
+  const { permalink } = await web.chat.getPermalink({
+    channel,
+    message_ts: ts,
+  })
+  return permalink
 }
 
 export const getTags = (message) => {
