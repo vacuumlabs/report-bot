@@ -1,5 +1,6 @@
 import http from 'http'
-import { RTMClient, WebClient } from '@slack/client'
+import {RTMClient} from '@slack/rtm-api'
+import {WebClient} from '@slack/web-api'
 import logger from './logger'
 import config from './config'
 
