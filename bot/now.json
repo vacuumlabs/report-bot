@@ -10,6 +10,7 @@
     "DB_PASSWORD": "@report-bot-db-password",
     "DB_NAME": "reportbot",
 
-    "SLACK_BOT_TOKEN": "@report-bot-slack-token"
+    "SLACK_APP_TOKEN": "@report-bot-slack-app-token",
+    "SLACK_BOT_TOKEN": "@report-bot-slack-bot-token"
   }
 }
