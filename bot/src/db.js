@@ -6,13 +6,13 @@ export const db = new Client(c.knex.connection)
 db.connect()
 
 export async function upsertReport({
-  ts, user, message, permalink, channel, response_to
+  ts, user, message, channel, response_to
 }) {
   return await db.query(
-    `INSERT INTO "report"(ts, "user", message, permalink, channel, response_to)
-     VALUES($1, $2, $3, $4, $5, $6)
+    `INSERT INTO "report"(ts, "user", message, channel, response_to)
+     VALUES($1, $2, $3, $4, $5)
      ON CONFLICT (ts) DO UPDATE SET "message" = $3`,
-    [ts, user, message, permalink, channel, response_to],
+    [ts, user, message, channel, response_to],
   )
 }
 

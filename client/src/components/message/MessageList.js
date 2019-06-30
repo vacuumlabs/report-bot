@@ -4,6 +4,7 @@ import MessageContent from './MessageContent'
 import ParentPreview from './ParentPreview'
 import Replies from './Replies'
 import {formatTs} from '../../utils/helpers'
+import * as routes from '../../routes'
 
 import './MessageList.scss'
 
@@ -38,7 +39,7 @@ function MessageItem({message, customEmojis, users, channels}) {
           <div className="authorName">{author.real_name}</div>
           <div className="messageDateTimeChannel">{dateTime} in {channelName}</div>
           <div className="messagePermalink">
-            <Link to={message.permalink}>Go to message on Slack</Link>
+            <Link to={routes.permalink(message)}>Go to message on Slack</Link>
           </div>
         </div>
         { !!responseTo &&

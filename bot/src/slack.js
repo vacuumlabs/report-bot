@@ -16,14 +16,6 @@ export const connectSlack = async () => {
   rtm.on('message', createOnMessageListener())
 }
 
-const getPermalink = async (channel, ts) => {
-  const { permalink } = await web.chat.getPermalink({
-    channel,
-    message_ts: ts,
-  })
-  return permalink
-}
-
 const getTags = (message) => {
   const tagRegexPattern = /:__\w+:/g
   const matches = message.match(tagRegexPattern)
@@ -37,13 +29,10 @@ const getTags = (message) => {
 const addMessage = async (event) => {
   const { channel, text: message, thread_ts, ts, user } = event
 
-  const permalink = await getPermalink(channel, ts)
-
   const report = {
     ts,
     user,
     message,
-    permalink,
     channel,
     response_to: thread_ts || null,
   }
