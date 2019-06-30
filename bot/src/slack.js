@@ -4,9 +4,9 @@ import logger from './logger'
 import config from './config'
 import {upsertReport, deleteReport, setTags, clearTags} from './db'
 
-const {botToken} = config.slack
+const {appToken, botToken} = config.slack
 const rtm = new RTMClient(botToken)
-const web = new WebClient(botToken)
+const web = new WebClient(appToken)
 
 export const connectSlack = async () => {
   await rtm.start()
@@ -89,10 +89,53 @@ const createOnMessageListener = () => {
       updateMessage(event)
     } else if (subtype === 'message_deleted') {
       deleteMessage(event)
+    } else if (subtype.endsWith('_join')) {
+      await syncMessages(event.channel)
     } else {
       logger.warn('Unsupported type of message: %s', subtype)
     }
   }
 
   return onMessage
+}
+
+async function syncMessages(channel) {
+  await Promise.all(
+    (await loadMessages(channel))
+    .map(addMessage)
+  )
+  logger.debug(`Channel with ID ${channel} successfully synchronized.`)
+}
+
+async function loadMessages(channel) {
+  const messages = []
+
+  for await (const page of web.paginate(
+    'conversations.history',
+    {channel, oldest: 0, limit: 200},
+  )) {
+    if (!page.ok) throw new Error(page.error)
+
+    const loadedMsg = page.messages.filter((m) => !m.subtype)
+    const replies = (await Promise.all(
+      loadedMsg
+      .filter((m) => m.replies)
+      .map((m) => loadReplies(channel, m.ts))
+    )).reduce((acc, val) => acc.concat(val), []) // flat
+
+    messages.push(...loadedMsg, ...replies)
+  }
+
+  return messages.map((m) => ({channel, ...m}))
+}
+
+async function loadReplies(channel, ts) {
+  const replies = []
+  for await (const page of web.paginate(
+    'conversations.replies',
+    {channel, ts, limit: 200},
+  )) replies.push(...page.messages)
+
+  replies.shift()
+  return replies
 }
