@@ -7,8 +7,7 @@ import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import querystring from 'querystring'
 
-import {getReportsByTag} from './knex/report'
-import {getTags} from './knex/tag'
+import {loadReportsByTag, loadTags} from './db.js'
 import {authorize, registerAuthRoutes} from './auth'
 
 const web = new WebClient(config.slack.appToken)
@@ -30,7 +29,7 @@ app.get('/', (req, res, next) => {
 })
 
 app.get('/api/tags', authorize, async (req, res) => {
-  const tags = await getTags()
+  const tags = await loadTags()
   res.json(tags)
 })
 
@@ -84,7 +83,7 @@ function normalizeEmoji(emoji) {
 }
 
 app.get('/api/reports-by-tags/:tag', authorize, async (req, res) => {
-  let reports = await getReportsByTag(req.params.tag)
+  let reports = await loadReportsByTag(req.params.tag)
   reports = await Promise.all(reports.map(async (r) => ({
     ...r,
     replies: (
