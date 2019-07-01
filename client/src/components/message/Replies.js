@@ -1,12 +1,9 @@
 import React from 'react'
-import config from '../../config'
 import * as routes from '../../routes'
 import { Link } from '../ui'
 import './Replies.scss'
 
 function Replies({ channel, customText, firstReplyAuthorPicture, repliesCount, ts }) {
-  const { workspaceName } = config.slack
-
   return (
     <div>
       {!!repliesCount && <div className='Replies'>

@@ -1,12 +1,10 @@
 import React from 'react'
-import config from '../../config'
 import { Link } from '../ui'
 import * as routes from '../../routes'
 import MessageContent from './MessageContent'
 import './ParentPreview.scss'
 
 function ParentPreview({users, channel, customEmojis, parentTs, parentText, threadTs}) {
-  const { workspaceName } = config.slack
   const firstLine = parentText.split('\n')[0]
 
   return (
