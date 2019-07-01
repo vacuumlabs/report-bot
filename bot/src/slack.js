@@ -17,7 +17,7 @@ export const connectSlack = async () => {
 }
 
 const getTags = (message) => {
-  const tagRegexPattern = /:__\w+:/g
+  const tagRegexPattern = /:__[a-zA-Z0-9_+-]+:/g
   const matches = message.match(tagRegexPattern)
   const tags = matches ? matches.map(item => item.substring(3, item.length - 1)) : []
 
