@@ -20,9 +20,9 @@ export default transenv()(({str, bool, num}) => {
       connection: {
         host: str('DB_HOST', 'localhost'),
         port: str('DB_PORT', 5432),
-        user: str('DB_USER', 'report_bot'),
+        user: str('DB_USER', 'postgres'),
         password: str('DB_PASSWORD', 'postgres'),
-        database: str('DB_NAME', 'postgres'),
+        database: str('DB_NAME', 'report_bot'),
       },
       migrations: {
         directory: 'migrations',
