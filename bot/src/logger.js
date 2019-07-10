@@ -10,5 +10,5 @@ export default createLogger({
   level: config.logLevel,
   transports: [
     new transports.Console(),
-  ]
+  ],
 })

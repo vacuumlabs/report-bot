@@ -32,7 +32,7 @@ export const authorize = async (req, res, next) => {
     if (e.response.status === 401) {
       res.sendStatus(401)
       return
-    } else throw e
+    } else {throw e}
   }
 
   next()

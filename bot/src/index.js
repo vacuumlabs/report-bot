@@ -1,13 +1,12 @@
 import http from 'http'
 import logger from './logger'
-import config from './config'
 
 import {connectSlack} from './slack'
 
 const app = async () => {
   try {
     await connectSlack()
-  } catch(error) {
+  } catch (error) {
     logger.error(error)
   }
 }
@@ -15,7 +14,7 @@ const app = async () => {
 app()
 
 http.createServer((req, res) => {
-  res.writeHead(404, {'Content-Type': 'text/plain'});
-  res.write('This is not a webserver!');
-  res.end();
-}).listen(8080);
+  res.writeHead(404, {'Content-Type': 'text/plain'})
+  res.write('This is not a webserver!')
+  res.end()
+}).listen(8080)

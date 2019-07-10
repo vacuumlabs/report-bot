@@ -5,7 +5,6 @@ import config from './config'
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
-import querystring from 'querystring'
 
 import {loadReportsByTag, loadTags} from './db.js'
 import {authorize, registerAuthRoutes} from './auth'
@@ -37,14 +36,14 @@ function mentions(message) {
   const regexp = /<@([A-Z0-9]+)>/ug
   const users = []
 
-  while (true) {
+  for (;;) {
     const match = regexp.exec(message)
     if (match == null) break
     users.push(match[1])
   }
   return users
 }
-  
+
 async function loadProfiles(userIds) {
   const profiles = await Promise.all(
     userIds.map((id) => web.users.profile.get({user: id}))
@@ -87,9 +86,9 @@ app.get('/api/reports-by-tags/:tag', authorize, async (req, res) => {
   reports = await Promise.all(reports.map(async (r) => ({
     ...r,
     replies: (
-        await web.conversations.replies(
-          {channel: r.channel, ts: r.response_to || r.ts}
-      )).messages
+      await web.conversations.replies(
+        {channel: r.channel, ts: r.response_to || r.ts}
+      )).messages,
   })))
 
   const authors = reports.map((r) => r.user)

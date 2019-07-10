@@ -1,3 +1,4 @@
+/* eslint camelcase: 0 */
 import {RTMClient} from '@slack/rtm-api'
 import {WebClient} from '@slack/web-api'
 import logger from './logger'
@@ -8,18 +9,10 @@ const {appToken, botToken} = config.slack
 const rtm = new RTMClient(botToken)
 const web = new WebClient(appToken)
 
-export const connectSlack = async () => {
-  await rtm.start()
-  logger.info('Successfully connected to Slack!')
-
-  // attach listeners
-  rtm.on('message', createOnMessageListener())
-}
-
 const getTags = (message) => {
   const tagRegexPattern = /:__[a-zA-Z0-9_+-]+:/g
   const matches = message.match(tagRegexPattern)
-  const tags = matches ? matches.map(item => item.substring(3, item.length - 1)) : []
+  const tags = matches ? matches.map((item) => item.substring(3, item.length - 1)) : []
 
   logger.debug('Following tags extracted from the message:\n%o', tags)
 
@@ -27,7 +20,7 @@ const getTags = (message) => {
 }
 
 const addMessage = async (event) => {
-  const { channel, text: message, thread_ts, ts, user } = event
+  const {channel, text: message, thread_ts, ts, user} = event
 
   const report = {
     ts,
@@ -47,7 +40,7 @@ const addMessage = async (event) => {
 }
 
 const updateMessage = async (event) => {
-  const { message: { text: message, ts } } = event
+  const {message: {text: message, ts}} = event
 
   await upsertReport({ts, message})
   await clearTags(ts)
@@ -60,7 +53,7 @@ const updateMessage = async (event) => {
 }
 
 const deleteMessage = async (event) => {
-  const { deleted_ts: ts } = event
+  const {deleted_ts: ts} = event
 
   await deleteReport(ts)
   await clearTags(ts)
@@ -70,7 +63,7 @@ const createOnMessageListener = () => {
   const onMessage = async (event) => {
     logger.debug('Received following message:\n%o', event)
 
-    const { subtype } = event
+    const {subtype} = event
 
     if (!subtype) {
       await addMessage(event)
@@ -91,7 +84,7 @@ const createOnMessageListener = () => {
 async function syncMessages(channel) {
   await Promise.all(
     (await loadMessages(channel))
-    .map(addMessage)
+      .map(addMessage)
   )
   logger.debug(`Channel with ID ${channel} successfully synchronized.`)
 }
@@ -108,8 +101,8 @@ async function loadMessages(channel) {
     const loadedMsg = page.messages.filter((m) => !m.subtype)
     const replies = (await Promise.all(
       loadedMsg
-      .filter((m) => m.replies)
-      .map((m) => loadReplies(channel, m.ts))
+        .filter((m) => m.replies)
+        .map((m) => loadReplies(channel, m.ts))
     )).reduce((acc, val) => acc.concat(val), []) // flat
 
     messages.push(...loadedMsg, ...replies)
@@ -127,4 +120,12 @@ async function loadReplies(channel, ts) {
 
   replies.shift()
   return replies
+}
+
+export const connectSlack = async () => {
+  await rtm.start()
+  logger.info('Successfully connected to Slack!')
+
+  // attach listeners
+  rtm.on('message', createOnMessageListener())
 }

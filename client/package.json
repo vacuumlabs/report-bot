@@ -17,7 +17,8 @@
   "scripts": {
     "clean": "rimraf build && rimraf node_modules",
     "start": "PORT=3001 react-scripts start",
-    "build": "react-scripts build"
+    "build": "react-scripts build",
+    "eslint": "eslint src"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -17,6 +17,6 @@ export async function loadReportsByTag(tag) {
 
 export async function loadTags() {
   return (await db.query(
-    `SELECT tag, count(*) as count FROM tag GROUP BY tag ORDER BY tag ASC`
+    'SELECT tag, count(*) as count FROM tag GROUP BY tag ORDER BY tag ASC'
   )).rows
 }

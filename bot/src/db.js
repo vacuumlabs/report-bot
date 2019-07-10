@@ -6,7 +6,7 @@ export const db = new Client(c.knex.connection)
 db.connect()
 
 export async function upsertReport({
-  ts, user, message, channel, response_to
+  ts, user, message, channel, response_to,
 }) {
   return await db.query(
     `INSERT INTO "report"(ts, "user", message, channel, response_to)
@@ -17,7 +17,7 @@ export async function upsertReport({
 }
 
 export async function deleteReport(ts) {
-  return await db.query(`DELETE FROM "report" WHERE ts=$1`, [ts])
+  return await db.query('DELETE FROM "report" WHERE ts=$1', [ts])
 }
 
 export async function setTags(ts, tags) {
@@ -30,5 +30,5 @@ export async function setTags(ts, tags) {
 }
 
 export async function clearTags(ts) {
-  return await db.query(`DELETE FROM "tag" WHERE report=$1`, [ts])
+  return await db.query('DELETE FROM "tag" WHERE report=$1', [ts])
 }
