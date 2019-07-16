@@ -10,7 +10,7 @@ const rtm = new RTMClient(botToken)
 const web = new WebClient(appToken)
 
 const getTags = (message) => {
-  const tagRegexPattern = /:__[a-zA-Z0-9_+-]+:/g
+  const tagRegexPattern = /:__[a-zA-Z0-9'_+-]+:/g
   const matches = message.match(tagRegexPattern)
   const tags = matches ? matches.map((item) => item.substring(3, item.length - 1)) : []
 
