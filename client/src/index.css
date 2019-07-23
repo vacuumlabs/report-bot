@@ -7,8 +7,7 @@ html {
 
 body {
   height: 100%;
-  max-width: 1368px;
-  margin: 0 auto;
+  margin: 0;
 }
 
 #root {
