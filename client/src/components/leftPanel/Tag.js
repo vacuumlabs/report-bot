@@ -8,10 +8,12 @@ class Tag extends Component {
   }
 
   render() {
-    const { tag, count } = this.props.tag
+    const { dataLoading, tag: { tag, count } } = this.props
 
     return (
-      <li onClick={this.handleClick}>{tag} ({count})</li>
+      <li>
+        <button disabled={dataLoading} onClick={this.handleClick}>{tag} ({count})</button>
+      </li>
     )
   }
 }

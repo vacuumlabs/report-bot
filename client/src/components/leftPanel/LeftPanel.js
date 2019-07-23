@@ -28,7 +28,7 @@ class LeftPanel extends Component {
   }
 
   render() {
-    const { onSelectTag } = this.props
+    const { onSelectTag, dataLoading } = this.props
     const { allVisible, loading, tags } = this.state
     const tagsToShow = allVisible ? tags : tags.slice(0, config.tagCountLimit)
 
@@ -42,7 +42,7 @@ class LeftPanel extends Component {
         {
           !loading && <ul>
             {tagsToShow.map(tag => 
-              (<Tag key={tag.tag} tag={tag} onClick={ onSelectTag } />)
+              (<Tag key={tag.tag} tag={tag} onClick={ onSelectTag } dataLoading={dataLoading} />)
             )}
           </ul>
         }

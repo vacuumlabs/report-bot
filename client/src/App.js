@@ -3,6 +3,7 @@ import LeftPanel from './components/leftPanel/LeftPanel'
 import TopPanel from './components/topPanel/TopPanel'
 import MessageList from './components/message/MessageList'
 import { getReportsByTag } from './utils/serverApi'
+import { Loader } from './components/ui'
 import './App.scss'
 
 class App extends Component {
@@ -10,9 +11,15 @@ class App extends Component {
     emoji: {},
     reports: [],
     selectedTag: null,
+    loading: false,
   }
 
   handleSelectTag = async (tag) => {
+    this.setState({
+      loading: true,
+      selectedTag: tag,
+    })
+
     const {reports, users, emoji, channels} = await getReportsByTag(tag)
 
     this.setState({
@@ -21,18 +28,22 @@ class App extends Component {
       users,
       emoji,
       channels,
+      loading: false,
     })
   }
 
   render() {
-    const {emoji, reports, users, channels, selectedTag} = this.state
+    const {emoji, reports, users, channels, selectedTag, loading} = this.state
 
     return (
       <div className="container">
-        <LeftPanel onSelectTag={this.handleSelectTag} />
+        <LeftPanel onSelectTag={this.handleSelectTag} dataLoading={loading} />
         <div className="content">
           <TopPanel selectedTag={selectedTag} customEmojis={emoji} />
-          <MessageList reports={reports} users={users} channels={channels} customEmojis={emoji} />
+          {
+            loading ? <Loader/>:
+            <MessageList reports={reports} users={users} channels={channels} customEmojis={emoji} />
+          }
         </div>  
       </div>
     )
