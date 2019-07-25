@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {Component} from 'react'
 import {Link} from '../ui'
 import MessageContent from './MessageContent'
 import ParentPreview from './ParentPreview'
@@ -8,15 +8,42 @@ import * as routes from '../../routes'
 
 import './MessageList.scss'
 
-function MessageList({customEmojis, reports, users, channels}) {
-  return (
-    <div className="MessageList">
-      {
-        reports.map(report => (<MessageItem key={report.id} message={report} users={users} channels={channels} customEmojis={customEmojis} />))
-      }
-    </div>
-  )
+class MessageList extends Component {
+
+  endOfList = React.createRef()
+
+  scrollToBottom = () => {
+    this.endOfList.current.scrollIntoView()
+  }
+  
+  componentDidMount() {
+    this.scrollToBottom()
+  }
+  
+  componentDidUpdate() {
+    this.scrollToBottom()
+  }
+
+  render () {
+    return (
+      <div className="MessageList">
+        {this.props.reports.map (report => (
+          <MessageItem
+            key={report.id}
+            message={report}
+            users={this.props.users}
+            channels={this.props.channels}
+            customEmojis={this.props.customEmojis}
+          />
+        ))}
+        {/* https://stackoverflow.com/questions/37620694/how-to-scroll-to-bottom-in-react */}
+        <div style={{ float:"left", clear: "both" }} ref={this.endOfList}>
+        </div>
+      </div>
+    )
+  }
 }
+
 
 export default MessageList
 
