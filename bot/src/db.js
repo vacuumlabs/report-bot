@@ -20,6 +20,12 @@ export async function deleteReport(ts) {
   return await db.query('DELETE FROM "report" WHERE ts=$1', [ts])
 }
 
+export async function getLatestReportsByChannel() {
+  return (await db.query(
+    'SELECT channel, MAX(ts) latest FROM report GROUP BY channel'
+  )).rows
+}
+
 export async function setTags(ts, tags) {
   return await db.query(
     `INSERT INTO "tag"(report, tag)
