@@ -24,7 +24,9 @@ export async function setTags(ts, tags) {
   return await db.query(
     `INSERT INTO "tag"(report, tag)
      SELECT $1 id, t
-     FROM unnest($2::text[]) t`,
+     FROM unnest($2::text[]) t
+     ON CONFLICT ON CONSTRAINT tag_tag_report_unique
+     DO NOTHING`,
     [ts, tags],
   )
 }
