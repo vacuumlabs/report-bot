@@ -3,7 +3,7 @@ import {RTMClient} from '@slack/rtm-api'
 import {WebClient} from '@slack/web-api'
 import logger from './logger'
 import config from './config'
-import {upsertReport, deleteReport, setTags, clearTags} from './db'
+import {upsertReport, deleteReport, setTags, clearTags, getLatestReportsByChannel} from './db'
 
 const {appToken, botToken} = config.slack
 const rtm = new RTMClient(botToken)
@@ -81,20 +81,20 @@ const createOnMessageListener = () => {
   return onMessage
 }
 
-async function syncMessages(channel) {
+async function syncMessages(channel, oldest = 0) {
   await Promise.all(
-    (await loadMessages(channel))
+    (await loadMessages(channel, oldest))
       .map(addMessage)
   )
   logger.debug(`Channel with ID ${channel} successfully synchronized.`)
 }
 
-async function loadMessages(channel) {
+async function loadMessages(channel, oldest) {
   const messages = []
 
   for await (const page of web.paginate(
     'conversations.history',
-    {channel, oldest: 0, limit: 200},
+    {channel, oldest, limit: 200},
   )) {
     if (!page.ok) throw new Error(page.error)
 
@@ -122,10 +122,27 @@ async function loadReplies(channel, ts) {
   return replies
 }
 
+async function catchUpMessages() {
+  const latestReportFrom = (await getLatestReportsByChannel())
+    .reduce((acc, row) => Object.assign(acc, {[row.channel]: row.latest}), {})
+
+  const watchedChannels = (await web.users.conversations(
+    {token: botToken, types: 'public_channel,private_channel'}
+  )).channels.map((c) => c.id)
+
+  for (const channel of watchedChannels) {
+    await syncMessages(channel, latestReportFrom[channel])
+  }
+
+  logger.info('Successfully caught up with unprocessed messages!')
+}
+
 export const connectSlack = async () => {
   await rtm.start()
   logger.info('Successfully connected to Slack!')
 
   // attach listeners
   rtm.on('message', createOnMessageListener())
+
+  await catchUpMessages()
 }
