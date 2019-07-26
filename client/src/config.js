@@ -6,6 +6,5 @@ export default transenv()(({str, bool, num}) => {
     slack: {
       team: 'T026LE24D',
     },
-    tagCountLimit: 20,
   }
 })

@@ -8,7 +8,6 @@ import './LeftPanel.scss'
 
 class LeftPanel extends Component {
   state = {
-    allVisible: true,
     loading: true,
     tags: [],
   }
@@ -17,20 +16,14 @@ class LeftPanel extends Component {
     const tags = await getTags()
 
     this.setState({
-      allVisible: tags.length <= config.tagCountLimit,
       loading: false,
       tags,
     })
   }
 
-  toggleAllVisible = () => {
-    this.setState({ allVisible: !this.state.allVisible })
-  }
-
   render() {
     const { onSelectTag, dataLoading } = this.props
-    const { allVisible, loading, tags } = this.state
-    const tagsToShow = allVisible ? tags : tags.slice(0, config.tagCountLimit)
+    const { loading, tags } = this.state
 
     return (
       <div className="LeftPanel">
@@ -41,12 +34,11 @@ class LeftPanel extends Component {
         { loading && <Loader light /> }
         {
           !loading && <ul>
-            {tagsToShow.map(tag => 
+            {tags.map(tag => 
               (<Tag key={tag.tag} tag={tag} onClick={ onSelectTag } dataLoading={dataLoading} />)
             )}
           </ul>
         }
-        { !loading && !allVisible && <button type="button" className="showAll" onClick={this.toggleAllVisible}>Show all</button>}
       </div>
     )
   }
