@@ -28,6 +28,7 @@ function MessageItem({message, customEmojis, users, channels}) {
   const channel = channels[message.channel]
   const channelName = (channel.is_channel ? '#' : '🔒') + channel.name
   const dateTime = formatTs(message.ts)
+  const replyCount = message.replies.length - 1
 
   return (
     <div className="MessageItem">
@@ -54,9 +55,9 @@ function MessageItem({message, customEmojis, users, channels}) {
         }
         <MessageContent text={message.message} users={users} customEmojis={customEmojis} />
         {
-          responseTo
-            ? <Replies channel={message.channel} customText={'View newer replies'} repliesCount={message.replies.length} ts={responseTo} />
-            : <Replies channel={message.channel} firstReplyAuthorPicture={firstReplyAuthor && firstReplyAuthor.image_32} repliesCount={message.replies.length} ts={message.ts} />
+          replyCount > 0 && (responseTo
+            ? <Replies channel={message.channel} customText={'View newer replies'} repliesCount={replyCount} ts={responseTo} />
+            : <Replies channel={message.channel} firstReplyAuthorPicture={firstReplyAuthor && firstReplyAuthor.image_32} repliesCount={replyCount} ts={message.ts} />)
         }
         
       </div>
