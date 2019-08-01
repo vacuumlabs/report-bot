@@ -8,8 +8,27 @@ import bodyParser from 'body-parser'
 
 import {loadReportsByTag, loadTags} from './db.js'
 import {authorize, registerAuthRoutes} from './auth'
+import * as cache from './cache'
 
 const web = new WebClient(config.slack.appToken)
+
+const indexById = (array) => {
+  return array.reduce(
+    (acc, row) => Object.assign(acc, {[row.id]: row}),
+    Object.create(null)
+  )
+}
+
+const users = cache.create(async (user) => {
+  const u = await web.users.profile.get({user})
+  return {...u.profile, id: user}
+})
+const channels = cache.create(async (channel) => {
+  const c = await web.conversations.info({channel})
+  return c.channel
+})
+const replies = cache.create((ts, channel) => web.conversations.replies({channel, ts}))
+const emojis = cache.create(() => web.emoji.list())
 
 const app = express()
 app.set('trust proxy', 'loopback')
@@ -45,28 +64,15 @@ function mentions(message) {
 }
 
 async function loadProfiles(userIds) {
-  const profiles = await Promise.all(
-    userIds.map((id) => web.users.profile.get({user: id}))
-  )
-
-  const users = {}
-  for (let i = 0; i < userIds.length; i++) {
-    const id = userIds[i]
-    users[id] = {...profiles[i].profile, id}
-  }
-
-  return users
+  return indexById(await Promise.all(
+    userIds.map((id) => cache.get(users, id))
+  ))
 }
 
 async function loadChannels(channelIds) {
-  const infos = await Promise.all(
-    channelIds.map((id) => web.conversations.info({channel: id}))
-  )
-
-  const channels = {}
-  for (const {channel} of infos) channels[channel.id] = channel
-
-  return channels
+  return indexById(await Promise.all(
+    channelIds.map((id) => cache.get(channels, id))
+  ))
 }
 
 function normalizeEmoji(emoji) {
@@ -86,8 +92,8 @@ app.get('/api/reports-by-tags/:tag', authorize, async (req, res) => {
   reports = await Promise.all(reports.map(async (r) => ({
     ...r,
     replies: (
-      await web.conversations.replies(
-        {channel: r.channel, ts: r.response_to || r.ts}
+      await cache.get(
+        replies, r.response_to || r.ts, r.channel
       )).messages,
   })))
 
@@ -102,7 +108,7 @@ app.get('/api/reports-by-tags/:tag', authorize, async (req, res) => {
     reports,
     users: await loadProfiles(userIds),
     channels: await loadChannels(channelIds),
-    emoji: normalizeEmoji((await web.emoji.list()).emoji),
+    emoji: normalizeEmoji((await cache.get(emojis)).emoji),
   })
 })
 
