@@ -5,6 +5,7 @@ import config from './config'
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
+import path from 'path'
 
 import {loadReportsByTag, loadTags} from './db.js'
 import {authorize, registerAuthRoutes} from './auth'
@@ -38,13 +39,8 @@ app.use(bodyParser.json())
 registerAuthRoutes(app)
 
 // serve CRA bundle
-const buildDir = `${__dirname}/../../client/build`
+const buildDir = path.join(`${__dirname}/../../client/build`)
 app.use(express.static(buildDir))
-
-// endpoints
-app.get('/', (req, res, next) => {
-  res.sendFile(`${buildDir}/index.html`)
-})
 
 app.get('/api/tags', authorize, async (req, res) => {
   const tags = await loadTags()
@@ -110,6 +106,11 @@ app.get('/api/reports-by-tags/:tag', authorize, async (req, res) => {
     channels: await loadChannels(channelIds),
     emoji: normalizeEmoji((await cache.get(emojis)).emoji),
   })
+})
+
+// endpoints
+app.get('*', (req, res, next) => {
+  res.sendFile(`${buildDir}/index.html`)
 })
 
 app.listen(config.port, () => {logger.info(`Server started on port: ${config.port}`)})
