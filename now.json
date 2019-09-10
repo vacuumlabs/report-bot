@@ -1,5 +1,5 @@
 {
-    "alias": ["reportbot.vacuumlabs.com"],
+    "alias": ["report.vacuumlabs.com"],
 
     "env": {
         "NODE_ENV":"production",
