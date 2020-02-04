@@ -5,8 +5,16 @@ import './LeftPanel.scss'
 
 class LeftPanel extends Component {
 
+  state = {
+    searchString: ""
+  }
+
+  handleChange = (event) => this.setState({ searchString: event.target.value })
+  
   render() {
     const {tags} = this.props
+    const {searchString} = this.state
+    const lowerCaseSearchString = searchString.trim().toLowerCase();
 
     return (
       <div className="LeftPanel">
@@ -14,9 +22,16 @@ class LeftPanel extends Component {
           <img className="logo" src={vacuumLogo} alt="VacuumLabs logo" />
         </a>
         <strong className="sectionTitle">Select tag</strong>
+        <input
+          type="text"
+          value={searchString}
+          onChange={this.handleChange}
+          placeholder="search"
+        />
         <ul>
-          {tags.map((tag) =>
-            (<Tag key={tag.tag} tag={tag} />)
+          {tags
+            .filter(({tag}) => tag.toLowerCase().includes(lowerCaseSearchString))
+            .map((tag) => (<Tag key={tag.tag} tag={tag} />)
           )}
         </ul>
       </div>
