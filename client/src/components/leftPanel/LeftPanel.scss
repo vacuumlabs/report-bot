@@ -36,4 +36,10 @@
     font-size: 1rem;
     text-align: left;
   }
+
+  input[type=text] {
+    box-sizing: border-box;
+    width: 184px;
+    margin: 5px 18px;
+  } 
 }
