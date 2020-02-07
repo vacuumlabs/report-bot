@@ -1,6 +1,15 @@
 {
     "alias": ["report.vacuumlabs.com"],
-
+    "scale": {
+        "bru1": {
+            "min": 1,
+            "max": "auto"
+        },
+        "sfo1": {
+            "min": 1,
+            "max": "auto"
+        }
+    },
     "env": {
         "NODE_ENV":"production",
 
