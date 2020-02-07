@@ -95,7 +95,10 @@ app.get('/api/reports-by-tags/:tag', authorize, async (req, res) => {
 
   const authors = reports.map((r) => r.user)
   const replyAuthors = [].concat(...reports.map((t) => t.replies.map((r) => r.user)))
-  const allMentions = [].concat(...reports.map((r) => mentions(r.message)))
+  const allMentions = 
+    [].concat(...reports.map(
+      (report) => [].concat(...report.replies.map(
+        (reply) => mentions(reply.text)))))
   const userIds = Array.from(new Set([...authors, ...replyAuthors, ...allMentions]))
   const channelIds = Array.from(new Set(reports.map((r) => r.channel)))
 
