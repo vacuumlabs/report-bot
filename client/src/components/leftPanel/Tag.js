@@ -1,16 +1,21 @@
 import React, { Component } from 'react'
 import {Link as RouterLink} from 'react-router-dom'
 import {parseTs} from '../../utils/helpers'
+import archivedIcon from '../../assets/archive.svg'
 import './Tag.scss'
 
 class Tag extends Component {
   render() {
-    const {tag, count, lastTs} = this.props.tag
+    const {tag, count, lastTs, isArchived} = this.props.tag
 
     return (
       <li>
         <RouterLink className={'tagLink'} to={`/${encodeURI(tag)}`}>
-          {tag} ({count}) <br/>
+          <span className="tagTitle">
+            {tag} ({count})
+            {isArchived && <img className="archived" src={archivedIcon} alt="archived" />}
+          </span>
+          <br/>
           <span className="lastTs">{parseTs(lastTs).fromNow()}</span>
         </RouterLink>
       </li>
