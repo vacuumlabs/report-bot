@@ -10,7 +10,7 @@ class LeftPanel extends Component {
     showArchived: false,
   }
 
-  handleChange = (event) => this.setState({ searchString: event.target.value })
+  onSearchChange = (event) => this.setState({ searchString: event.target.value })
   
   onShowArchivedChange = (event) => this.setState({showArchived: event.target.checked})
 
@@ -26,12 +26,7 @@ class LeftPanel extends Component {
             <img className="logo" src={vacuumLogo} alt="VacuumLabs logo" />
           </a>
           <strong className="sectionTitle">Select tag</strong>
-          <input
-            type="text"
-            value={searchString}
-            onChange={this.handleChange}
-            placeholder="search"
-          />
+          <QuickSearch value={searchString} onChange={this.onSearchChange} />
           {!searchString && (
 	          <ShowArchivedBox
 		          label="show archived projects"
@@ -53,6 +48,17 @@ class LeftPanel extends Component {
       </div>
     )
   }
+}
+
+function QuickSearch({value, onChange}) {
+  return (
+    <input
+      type="text"
+      value={value}
+      onChange={onChange}
+      placeholder="search"
+    />
+  )
 }
 
 function ShowArchivedBox({label, isChecked, onChange}) {
