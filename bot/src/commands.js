@@ -1,4 +1,5 @@
 import logger from './logger'
+import config from './config'
 import {archive} from './db'
 
 const commands = [
@@ -21,13 +22,20 @@ export function getTags(message) {
   return tags
 }
 
-export async function handleCommands(event) {
-  const {text: message, ts} = event
+export async function handleCommands(event, web) {
+  const {botToken} = config.slack
+  const {text: message, channel, ts} = event
   const tags = getTags(message)
   for (const {pattern, action} of commands) {
     const match = message.match(pattern)
     if (!match) continue
     logger.debug(`executing ${match[0]}`)
     await action(match, tags, ts)
+    await web.reactions.add({
+      token: botToken,
+      channel,
+      timestamp: ts,
+      name: 'heavy_check_mark',
+    })
   }
 }

@@ -29,7 +29,7 @@ const addMessage = async (event) => {
     await setTags(ts, tags)
   }
 
-  await handleCommands(event)
+  await handleCommands(event, web)
 }
 
 const updateMessage = async (event) => {
