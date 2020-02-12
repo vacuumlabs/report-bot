@@ -6,9 +6,9 @@
   background-color: #253442;
   color: white;
   overflow-y: auto;
-
+  overflow-x: hidden;
+  
   a {
-    display: flex;
     
     .logo {
       width: 152px;
