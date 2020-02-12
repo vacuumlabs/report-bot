@@ -1,3 +1,11 @@
+.LeftPanelContainer {
+  display: flex;
+  background-color: #253442;
+}
+.LeftPanelContainer.padded {
+    padding-bottom: 50px;
+}
+
 .LeftPanel {
   display: flex;
   flex: 0 0 220px;
@@ -41,5 +49,11 @@
     box-sizing: border-box;
     width: 184px;
     margin: 5px 18px;
-  } 
+  }
+
+  .ShowArchivedBox {
+    position: absolute;
+    bottom: 18px;
+    margin-left: 14px;
+  }
 }
