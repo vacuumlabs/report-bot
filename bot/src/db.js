@@ -61,3 +61,15 @@ export async function archive(tags, status, ts) {
     [tags, status, ts]
   )
 }
+
+export async function setFrequency(tagsWithFrequency, ts) {
+  return await db.query(
+    `INSERT INTO tag(tag, frequency, frequency_ts)
+     SELECT tag, frequency, $3
+     FROM unnest($1::text[], $2::integer[]) t(tag,frequency)
+     ON CONFLICT (tag) DO UPDATE
+     SET frequency=excluded.frequency, frequency_ts=$3
+     WHERE tag.frequency_ts<$3`,
+    [Object.keys(tagsWithFrequency), Object.values(tagsWithFrequency), ts]
+  )
+}

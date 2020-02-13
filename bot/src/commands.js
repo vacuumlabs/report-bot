@@ -1,19 +1,33 @@
 import logger from './logger'
 import config from './config'
-import {archive} from './db'
+import {archive, setFrequency} from './db'
+
+const tagRegexPattern = /:__([a-zA-Z0-9'_+-]+):/g
 
 const commands = [
   {
     pattern: /^(un)?archive\s/,
-    action: async (match, tags, ts) => {
+    action: async (match, message, ts) => {
+      const tags = getTags(message)
       const isArchive = !match[1]
       await archive(tags, isArchive, ts)
+    },
+  },
+  {
+    pattern: /^frequency\s/,
+    action: async (match, message, ts) => {
+      const tagFrequencyPattern = new RegExp(`${tagRegexPattern.source}\\s+(\\d+)`, 'g')
+      const tagsWithFrequency = Object.create(null)
+      let result
+      while ((result = tagFrequencyPattern.exec(message)) !== null) {
+        tagsWithFrequency[result[1]] = result[2]
+      }
+      await setFrequency(tagsWithFrequency, ts)
     },
   },
 ]
 
 export function getTags(message) {
-  const tagRegexPattern = /:__[a-zA-Z0-9'_+-]+:/g
   const matches = message.match(tagRegexPattern)
   const tags = matches ? matches.map((item) => item.substring(3, item.length - 1)) : []
 
@@ -25,12 +39,11 @@ export function getTags(message) {
 export async function handleCommands(event, web) {
   const {botToken} = config.slack
   const {text: message, channel, ts} = event
-  const tags = getTags(message)
   for (const {pattern, action} of commands) {
     const match = message.match(pattern)
     if (!match) continue
     logger.debug(`executing ${match[0]}`)
-    await action(match, tags, ts)
+    await action(match, message, ts)
     await web.reactions.add({
       token: botToken,
       channel,
