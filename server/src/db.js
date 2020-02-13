@@ -17,7 +17,7 @@ export async function loadReportsByTag(tag) {
 
 export async function loadTags() {
   return (await db.query(
-    `SELECT tag, count, "lastTs", is_archived as "isArchived"
+    `SELECT tag, count, "lastTs", is_archived as "isArchived", frequency
      FROM (SELECT tag, count(*) as count, max(report) as "lastTs"
            FROM tagged GROUP BY tag) t
      NATURAL JOIN tag

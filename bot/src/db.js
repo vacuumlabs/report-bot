@@ -28,8 +28,8 @@ export async function getLatestReportsByChannel() {
 
 export async function setTags(ts, tags) {
   await db.query(
-    `INSERT INTO tag(tag, archived_ts)
-     SELECT t, $1
+    `INSERT INTO tag(tag, archived_ts, frequency_ts)
+     SELECT t, $1, $1
      FROM unnest($2::text[]) t
      ON CONFLICT ON CONSTRAINT tag_pkey
      DO NOTHING`,
