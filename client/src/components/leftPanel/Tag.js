@@ -6,11 +6,11 @@ import './Tag.scss'
 
 class Tag extends Component {
   render() {
-    const {tag, count, lastTs, isArchived} = this.props.tag
+    const {tag, count, lastTs, isArchived, isLate} = this.props.tag
 
     return (
       <li>
-        <RouterLink className={'tagLink'} to={`/${encodeURI(tag)}`}>
+        <RouterLink className={`tagLink${isLate?' late':''}`} to={`/${encodeURI(tag)}`}>
           <span className="tagTitle">
             {tag} ({count})
             {isArchived && <img className="archived" src={archivedIcon} alt="archived" />}
