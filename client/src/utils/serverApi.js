@@ -1,5 +1,5 @@
-export const getReportsByTag = async (tag) => {
-  const response = await fetch(`/api/reports-by-tags/${tag}`)
+export const getReportData = async () => {
+  const response = await fetch('/api/reports')
   return response.json()
 }
 

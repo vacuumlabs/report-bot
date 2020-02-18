@@ -1,4 +1,5 @@
 import {WebClient} from '@slack/web-api'
+import _ from 'lodash'
 import logger from './logger'
 import config from './config'
 
@@ -7,7 +8,7 @@ import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import path from 'path'
 
-import {loadReportsByTag, loadTags} from './db.js'
+import {loadReports, loadTags} from './db.js'
 import {authorize, registerAuthRoutes} from './auth'
 import * as cache from './cache'
 
@@ -83,8 +84,8 @@ function normalizeEmoji(emoji) {
   return res
 }
 
-app.get('/api/reports-by-tags/:tag', authorize, async (req, res) => {
-  let reports = await loadReportsByTag(req.params.tag)
+async function loadReportData() {
+  let reports = await loadReports()
   reports = await Promise.all(reports.map(async (r) => ({
     ...r,
     replies: (
@@ -102,13 +103,18 @@ app.get('/api/reports-by-tags/:tag', authorize, async (req, res) => {
   const userIds = Array.from(new Set([...authors, ...replyAuthors, ...allMentions]))
   const channelIds = Array.from(new Set(reports.map((r) => r.channel)))
 
+  reports = _.groupBy(reports, 'tag')
 
-  res.json({
+  return {
     reports,
     users: await loadProfiles(userIds),
     channels: await loadChannels(channelIds),
     emoji: normalizeEmoji((await cache.get(emojis)).emoji),
-  })
+  }
+}
+
+app.get('/api/reports', authorize, async (req, res) => {
+  res.json(await loadReportData())
 })
 
 // endpoints
@@ -116,5 +122,6 @@ app.get('*', (req, res, next) => {
   res.sendFile(`${buildDir}/index.html`)
 })
 
+loadReportData()
 app.listen(config.port, () => {logger.info(`Server started on port: ${config.port}`)})
 
