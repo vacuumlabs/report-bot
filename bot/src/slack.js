@@ -4,20 +4,11 @@ import {WebClient} from '@slack/web-api'
 import logger from './logger'
 import config from './config'
 import {upsertReport, deleteReport, setTags, clearTags, getLatestReportsByChannel} from './db'
+import {getTags, handleCommands} from './commands'
 
 const {appToken, botToken} = config.slack
 const rtm = new RTMClient(botToken)
 const web = new WebClient(appToken)
-
-const getTags = (message) => {
-  const tagRegexPattern = /:__[a-zA-Z0-9'_+-]+:/g
-  const matches = message.match(tagRegexPattern)
-  const tags = matches ? matches.map((item) => item.substring(3, item.length - 1)) : []
-
-  logger.debug('Following tags extracted from the message:\n%o', tags)
-
-  return tags
-}
 
 const addMessage = async (event) => {
   const {channel, text: message, thread_ts, ts, user} = event
@@ -37,6 +28,8 @@ const addMessage = async (event) => {
   if (tags.length) {
     await setTags(ts, tags)
   }
+
+  await handleCommands(event, web)
 }
 
 const updateMessage = async (event) => {

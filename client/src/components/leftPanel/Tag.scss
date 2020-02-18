@@ -24,6 +24,16 @@
   cursor: default;
 }
 
+.tagTitle {
+  display: inline-flex;
+}
+
 .lastTs {
   color: #7991A6;
+}
+
+.archived {
+  height: 14px;
+  margin-left: 5px;
+  align-self: center;
 }

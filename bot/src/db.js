@@ -27,16 +27,37 @@ export async function getLatestReportsByChannel() {
 }
 
 export async function setTags(ts, tags) {
+  await db.query(
+    `INSERT INTO tag(tag, archived_ts)
+     SELECT t, $1
+     FROM unnest($2::text[]) t
+     ON CONFLICT ON CONSTRAINT tag_pkey
+     DO NOTHING`,
+    [ts, tags]
+  )
   return await db.query(
-    `INSERT INTO "tag"(report, tag)
+    `INSERT INTO "tagged"(report, tag)
      SELECT $1 id, t
      FROM unnest($2::text[]) t
-     ON CONFLICT ON CONSTRAINT tag_tag_report_unique
+     ON CONFLICT ON CONSTRAINT tagged_tag_report_unique
      DO NOTHING`,
     [ts, tags],
   )
 }
 
 export async function clearTags(ts) {
-  return await db.query('DELETE FROM "tag" WHERE report=$1', [ts])
+  return await db.query('DELETE FROM "tagged" WHERE report=$1', [ts])
+}
+
+export async function archive(tags, status, ts) {
+  tags = [...new Set(tags)]
+  return await db.query(
+    `INSERT INTO tag(tag, is_archived, archived_ts)
+     SELECT t, $2, $3
+     FROM unnest($1::text[]) t
+     ON CONFLICT (tag) DO UPDATE
+     SET is_archived=$2, archived_ts=$3
+     WHERE tag.archived_ts<$3`,
+    [tags, status, ts]
+  )
 }
