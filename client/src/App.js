@@ -10,10 +10,19 @@ import './App.scss'
 class App extends Component {
   state = {}
 
-  async componentDidMount() {
+  loadReports = async () => {
     const tags = await getTags()
     const reportData = await getReportData()
     this.setState({tags, reportData})
+  }
+
+  async componentDidMount() {
+    await this.loadReports()
+    this.refreshInterval = setInterval(this.loadReports, 5 * 60 * 1000)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.refreshInterval)
   }
 
   render() {
@@ -27,7 +36,7 @@ class App extends Component {
           <LeftPanel tags={tags} />
           <Switch>
             <Redirect exact from='/' to={`/${encodeURI(tags[0].tag)}`} />
-            <Route exact path='/:tag' component={(props) => {
+            <Route exact path='/:tag' render={(props) => {
               const tag = decodeURI(props.match.params.tag)
               const {reports, users, channels, emoji} = reportData
               return tags.some((t) => t.tag === tag)
