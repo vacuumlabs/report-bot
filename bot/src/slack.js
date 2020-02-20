@@ -23,13 +23,12 @@ const addMessage = async (event) => {
 
   await upsertReport(report)
 
+  const isCommand = await handleCommands(event, web)
   const tags = getTags(message)
 
   if (tags.length) {
-    await setTags(ts, tags)
+    await setTags(ts, tags, isCommand)
   }
-
-  await handleCommands(event, web)
 }
 
 const updateMessage = async (event) => {

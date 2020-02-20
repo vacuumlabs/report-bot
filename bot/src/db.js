@@ -26,7 +26,7 @@ export async function getLatestReportsByChannel() {
   )).rows
 }
 
-export async function setTags(ts, tags) {
+export async function setTags(ts, tags, isCommand) {
   await db.query(
     `INSERT INTO tag(tag, archived_ts, frequency_ts)
      SELECT t, $1, $1
@@ -36,12 +36,12 @@ export async function setTags(ts, tags) {
     [ts, tags]
   )
   return await db.query(
-    `INSERT INTO "tagged"(report, tag)
-     SELECT $1 id, t
+    `INSERT INTO "tagged"(report, tag, is_command)
+     SELECT $1 id, t, $3
      FROM unnest($2::text[]) t
      ON CONFLICT ON CONSTRAINT tagged_tag_report_unique
      DO NOTHING`,
-    [ts, tags],
+    [ts, tags, isCommand],
   )
 }
 

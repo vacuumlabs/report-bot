@@ -39,6 +39,7 @@ export function getTags(message) {
 export async function handleCommands(event, web) {
   const {botToken} = config.slack
   const {text: message, channel, ts} = event
+  let isCommand = false
   for (const {pattern, action} of commands) {
     const match = message.match(pattern)
     if (!match) continue
@@ -50,5 +51,7 @@ export async function handleCommands(event, web) {
       timestamp: ts,
       name: 'heavy_check_mark',
     })
+    isCommand = true
   }
+  return isCommand
 }
