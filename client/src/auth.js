@@ -10,7 +10,7 @@ export const setupAuthentication = () => {
   }
 
   const renderError = (message) => {
-    ReactDOM.render(<div>{message}</div>, rootElement)
+    ReactDOM.render(<div className="error">{message}</div>, rootElement)
   }
 
   axios.interceptors.response.use(undefined, (error) => {
