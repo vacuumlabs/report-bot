@@ -26,22 +26,22 @@ export async function getLatestReportsByChannel() {
   )).rows
 }
 
-export async function setTags(ts, tags) {
+export async function setTags(ts, tags, isCommand) {
   await db.query(
-    `INSERT INTO tag(tag, archived_ts)
-     SELECT t, $1
+    `INSERT INTO tag(tag, archived_ts, frequency_ts)
+     SELECT t, $1, $1
      FROM unnest($2::text[]) t
      ON CONFLICT ON CONSTRAINT tag_pkey
      DO NOTHING`,
     [ts, tags]
   )
   return await db.query(
-    `INSERT INTO "tagged"(report, tag)
-     SELECT $1 id, t
+    `INSERT INTO "tagged"(report, tag, is_command)
+     SELECT $1 id, t, $3
      FROM unnest($2::text[]) t
      ON CONFLICT ON CONSTRAINT tagged_tag_report_unique
      DO NOTHING`,
-    [ts, tags],
+    [ts, tags, isCommand],
   )
 }
 
@@ -59,5 +59,17 @@ export async function archive(tags, status, ts) {
      SET is_archived=$2, archived_ts=$3
      WHERE tag.archived_ts<$3`,
     [tags, status, ts]
+  )
+}
+
+export async function setFrequency(tagsWithFrequency, ts) {
+  return await db.query(
+    `INSERT INTO tag(tag, frequency, frequency_ts)
+     SELECT tag, frequency, $3
+     FROM unnest($1::text[], $2::integer[]) t(tag,frequency)
+     ON CONFLICT (tag) DO UPDATE
+     SET frequency=excluded.frequency, frequency_ts=$3
+     WHERE tag.frequency_ts<$3`,
+    [Object.keys(tagsWithFrequency), Object.values(tagsWithFrequency), ts]
   )
 }

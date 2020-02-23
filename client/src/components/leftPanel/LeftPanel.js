@@ -1,5 +1,8 @@
 import React, { Component } from 'react'
+import _ from 'lodash'
 import vacuumLogo from '../../assets/vacuum-logo-light.svg'
+import moment from 'moment'
+import {parseTs} from '../../utils/helpers'
 import Tag from './Tag'
 import './LeftPanel.scss'
 
@@ -16,6 +19,11 @@ class LeftPanel extends Component {
 
   render() {
     const {tags} = this.props
+    for (const tag of tags) {
+      tag.isLate =
+        !tag.isArchived && moment().diff(parseTs(tag.lastTs), 'days') > tag.frequency
+    }
+    const partitionedTags = _.flatten(_.partition(tags, 'isLate'))
     const {searchString, showArchived} = this.state
     const lowerCaseSearchString = searchString.trim().toLowerCase();
 
@@ -35,7 +43,7 @@ class LeftPanel extends Component {
 	          />
           )}
           <ul>
-            {tags
+            {partitionedTags
               .filter(
                 ({tag, isArchived}) =>
                   tag.toLowerCase().includes(lowerCaseSearchString) &&
