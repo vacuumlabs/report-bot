@@ -15,5 +15,11 @@
         "required_team_id": "2509915",
         "VL_SSO_KEY": "@vl-sso-key",
         "VL_SSO_URL": "https://sso.vacuumlabs.com"
+    },
+
+    "build": {
+        "env": {
+            "REACT_APP_LOGIN_URL": "/auth/login"
+        }
     }
 }
