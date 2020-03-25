@@ -8,7 +8,7 @@ import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import path from 'path'
 
-import {loadReports, loadTags} from './db.js'
+import {loadReports, loadReplies, loadTags} from './db.js'
 import {authorize, registerAuthRoutes} from './auth'
 import * as cache from './cache'
 
@@ -29,7 +29,6 @@ const channels = cache.create(async (channel) => {
   const c = await web.conversations.info({channel})
   return c.channel
 })
-const replies = cache.create((ts, channel) => web.conversations.replies({channel, ts}))
 const emojis = cache.create(() => web.emoji.list())
 
 const app = express()
@@ -85,21 +84,18 @@ function normalizeEmoji(emoji) {
 }
 
 async function loadReportData() {
-  let reports = await loadReports()
-  reports = await Promise.all(reports.map(async (r) => ({
+  const repliesByThread = _.groupBy(await loadReplies(), (r) => r.response_to || r.ts)
+  let reports = (await loadReports()).map((r) => ({
     ...r,
-    replies: (
-      await cache.get(
-        replies, r.response_to || r.ts, r.channel
-      )).messages,
-  })))
+    replies: repliesByThread[r.response_to || r.ts],
+  }))
 
   const authors = reports.map((r) => r.user)
   const replyAuthors = [].concat(...reports.map((t) => t.replies.map((r) => r.user)))
   const allMentions =
     [].concat(...reports.map(
       (report) => [].concat(...report.replies.map(
-        (reply) => mentions(reply.text)))))
+        (reply) => mentions(reply.message)))))
   const userIds = Array.from(new Set([...authors, ...replyAuthors, ...allMentions]))
   const channelIds = Array.from(new Set(reports.map((r) => r.channel)))
 

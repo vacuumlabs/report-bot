@@ -13,6 +13,14 @@ export async function loadReports() {
   )).rows
 }
 
+export async function loadReplies() {
+  return (await db.query(
+    `SELECT ts, "user", message, channel, response_to
+     FROM report
+     ORDER BY ts ASC`
+  )).rows
+}
+
 export async function loadTags() {
   return (await db.query(
     `SELECT tag, count, "lastTs", is_archived as "isArchived", frequency
