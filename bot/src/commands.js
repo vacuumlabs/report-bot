@@ -38,17 +38,17 @@ export function getTags(message) {
 
 export async function handleCommands(event, web) {
   const {botToken} = config.slack
-  const {text: message, channel, ts} = event
+  const {message, channel, ts: messageTs, eventTs = messageTs} = event
   let isCommand = false
   for (const {pattern, action} of commands) {
     const match = message.match(pattern)
     if (!match) continue
     logger.debug(`executing ${match[0]}`)
-    await action(match, message, ts)
+    await action(match, message, eventTs)
     await web.reactions.add({
       token: botToken,
       channel,
-      timestamp: ts,
+      timestamp: messageTs,
       name: 'heavy_check_mark',
     })
     isCommand = true

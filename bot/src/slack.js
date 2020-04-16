@@ -23,7 +23,7 @@ const addMessage = async (event) => {
 
   await upsertReport(report)
 
-  const isCommand = await handleCommands(event, web)
+  const isCommand = await handleCommands({message, channel, ts}, web)
   const tags = getTags(message)
 
   if (tags.length) {
@@ -32,15 +32,27 @@ const addMessage = async (event) => {
 }
 
 const updateMessage = async (event) => {
-  const {message: {text: message, ts}} = event
+  const {message: {text: message, ts}, channel, ts: eventTs} = event
+
+  await web.reactions.remove({
+    token: botToken,
+    channel,
+    timestamp: ts,
+    name: 'heavy_check_mark',
+  }).catch((error) => {
+    if (error.data.error !== 'no_reaction') {
+      throw error
+    }
+  })
 
   await upsertReport({ts, message})
   await clearTags(ts)
 
+  const isCommand = await handleCommands({message, channel, ts, eventTs}, web)
   const tags = getTags(message)
 
   if (tags.length) {
-    await setTags(ts, tags)
+    await setTags(ts, tags, isCommand)
   }
 }
 
