@@ -1,4 +1,5 @@
 import {WebClient} from '@slack/web-api'
+import _ from 'lodash'
 import logger from './logger'
 import config from './config'
 
@@ -7,7 +8,7 @@ import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import path from 'path'
 
-import {loadReportsByTag, loadTags} from './db.js'
+import {loadReports, loadReplies, loadTags} from './db.js'
 import {authorize, registerAuthRoutes} from './auth'
 import * as cache from './cache'
 
@@ -28,7 +29,6 @@ const channels = cache.create(async (channel) => {
   const c = await web.conversations.info({channel})
   return c.channel
 })
-const replies = cache.create((ts, channel) => web.conversations.replies({channel, ts}))
 const emojis = cache.create(() => web.emoji.list())
 
 const app = express()
@@ -83,32 +83,34 @@ function normalizeEmoji(emoji) {
   return res
 }
 
-app.get('/api/reports-by-tags/:tag', authorize, async (req, res) => {
-  let reports = await loadReportsByTag(req.params.tag)
-  reports = await Promise.all(reports.map(async (r) => ({
+async function loadReportData() {
+  const repliesByThread = _.groupBy(await loadReplies(), (r) => r.response_to || r.ts)
+  let reports = (await loadReports()).map((r) => ({
     ...r,
-    replies: (
-      await cache.get(
-        replies, r.response_to || r.ts, r.channel
-      )).messages,
-  })))
+    replies: repliesByThread[r.response_to || r.ts],
+  }))
 
   const authors = reports.map((r) => r.user)
   const replyAuthors = [].concat(...reports.map((t) => t.replies.map((r) => r.user)))
   const allMentions =
     [].concat(...reports.map(
       (report) => [].concat(...report.replies.map(
-        (reply) => mentions(reply.text)))))
+        (reply) => mentions(reply.message)))))
   const userIds = Array.from(new Set([...authors, ...replyAuthors, ...allMentions]))
   const channelIds = Array.from(new Set(reports.map((r) => r.channel)))
 
+  reports = _.groupBy(reports, 'tag')
 
-  res.json({
+  return {
     reports,
     users: await loadProfiles(userIds),
     channels: await loadChannels(channelIds),
     emoji: normalizeEmoji((await cache.get(emojis)).emoji),
-  })
+  }
+}
+
+app.get('/api/reports', authorize, async (req, res) => {
+  res.json(await loadReportData())
 })
 
 // endpoints
@@ -116,5 +118,6 @@ app.get('*', (req, res, next) => {
   res.sendFile(`${buildDir}/index.html`)
 })
 
+loadReportData()
 app.listen(config.port, () => {logger.info(`Server started on port: ${config.port}`)})
 

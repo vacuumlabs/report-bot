@@ -5,13 +5,19 @@ import {Client} from 'pg'
 export const db = new Client(c.knex.connection)
 db.connect()
 
-export async function loadReportsByTag(tag) {
+export async function loadReports() {
+  return (await db.query(
+    `SELECT ts, tag, "user", message, channel, response_to
+     FROM tagged LEFT JOIN report ON tagged.report=report.ts
+     ORDER BY ts ASC`
+  )).rows
+}
+
+export async function loadReplies() {
   return (await db.query(
     `SELECT ts, "user", message, channel, response_to
-     FROM tagged LEFT JOIN report ON tagged.report=report.ts
-     WHERE tagged.tag = $1
-     ORDER BY ts ASC`,
-    [tag],
+     FROM report
+     ORDER BY ts ASC`
   )).rows
 }
 

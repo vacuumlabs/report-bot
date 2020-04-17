@@ -76,7 +76,7 @@ function MessageItem({message, customEmojis, users, channels}) {
             channel={message.channel}
             customEmojis={customEmojis}
             parentTs={responseTo}
-            parentText={message.replies[0].text}
+            parentText={message.replies[0].message}
             threadTs={responseTo}
           />
         }

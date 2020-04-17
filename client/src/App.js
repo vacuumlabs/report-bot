@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom'
 
-import {getTags} from './utils/serverApi'
+import {getTags, getReportData} from './utils/serverApi'
 import LeftPanel from './components/leftPanel/LeftPanel'
 import Content from './components/content/Content'
 import {Loader} from './components/ui'
@@ -10,15 +10,24 @@ import './App.scss'
 class App extends Component {
   state = {}
 
-  async componentDidMount() {
+  loadReports = async () => {
     const tags = await getTags()
-    this.setState({tags})
+    const reportData = await getReportData()
+    this.setState({tags, reportData})
+  }
+
+  async componentDidMount() {
+    await this.loadReports()
+    this.refreshInterval = setInterval(this.loadReports, 5 * 60 * 1000)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.refreshInterval)
   }
 
   render() {
-    const {tags} = this.state
+    const {tags, reportData} = this.state
     const loading = tags === undefined
-
     return (
       <div className="container">
         {loading && <Loader light />}
@@ -27,10 +36,18 @@ class App extends Component {
           <LeftPanel tags={tags} />
           <Switch>
             <Redirect exact from='/' to={`/${encodeURI(tags[0].tag)}`} />
-            <Route exact path='/:tag' component={(props) => {
+            <Route exact path='/:tag' render={(props) => {
               const tag = decodeURI(props.match.params.tag)
+              const {reports, users, channels, emoji} = reportData
               return tags.some((t) => t.tag === tag)
-                ? (<Content key={tag} tag={tag} />)
+                ? (<Content
+                    key={tag}
+                    tag={tag}
+                    reports={reports[tag]}
+                    users={users}
+                    channels={channels}
+                    emoji={emoji}
+                  />)
                 : (<div className="info">Unknown tag.</div>)
             }} />
           </Switch>

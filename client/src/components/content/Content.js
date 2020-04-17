@@ -1,37 +1,21 @@
 import React, {Component} from 'react'
+import _ from 'lodash'
 import TopPanel from '../topPanel/TopPanel'
 import MessageList from '../message/MessageList'
-import {Loader} from '../ui'
-import {getReportsByTag} from '../../utils/serverApi'
 import './Content.scss'
 
 class Content extends Component {
-  state = {
-    loading: true,
-  }
 
-  async componentDidMount() {
-    const response = await getReportsByTag(this.props.tag)
-    this.setState({...response, loading: false})
+  shouldComponentUpdate(nextProps) {
+    return !_.isEqual(this.props.reports, nextProps.reports)
   }
 
   render() {
-    const {tag} = this.props
-    const {emoji, reports, users, channels, loading} = this.state
-
+    const {tag, reports, users, channels, emoji} = this.props
     return (
       <div className="Content">
-        {loading &&
-          <div className="loader">
-            <Loader />
-          </div>
-        }
-        {!loading &&
-          <>
-            <TopPanel selectedTag={tag} customEmojis={emoji} />
-            <MessageList reports={reports} users={users} channels={channels} customEmojis={emoji} />
-          </>
-        }
+        <TopPanel selectedTag={tag} customEmojis={emoji} />
+        <MessageList reports={reports} users={users} channels={channels} customEmojis={emoji} />
       </div>
     )
   }
