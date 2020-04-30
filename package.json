@@ -1,18 +1,24 @@
 {
   "name": "report-bot",
   "version": "1.0.0",
-  "repository": "git@github.com:vacuumlabs/report-bot.git",
-  "author": "Tomas Fabry <tomas.fabry@vacuumlabs.com>",
+  "private": true,
   "license": "Unlicense",
+  "workspaces": {
+    "packages": [
+      "client",
+      "server",
+      "bot"
+    ],
+    "nohoist": [
+      "**"
+    ]
+  },
   "scripts": {
+    "build": "yarn workspace client build && yarn workspace server build && yarn workspace bot build",
+    "clean": "rm -rf node_modules && yarn workspace client clean && yarn workspace server clean && yarn workspace bot clean",
+    "dev": "concurrently \"yarn workspace server dev\" \"yarn workspace client start\"",
+    "eslint": "yarn workspace client eslint && yarn workspace server eslint && yarn workspace bot eslint",
     "knex": "knex --knexfile knex/knexfile.js",
-    "build": "yarn --cwd client && yarn --cwd client build && yarn --cwd server && yarn --cwd server build",
-    "clean": "rimraf node_modules && yarn --cwd client clean && yarn --cwd server clean",
-    "client": "yarn --cwd client start",
-    "server": "yarn --cwd server dev",
-    "start": "yarn --cwd server start",
-    "dev": "concurrently \"yarn server\" \"yarn client\"",
-    "eslint": "(cd server; yarn eslint) && (cd bot; yarn eslint;) && (cd client; yarn eslint)",
     "test": "yarn eslint"
   },
   "husky": {
@@ -26,5 +32,8 @@
     "knex": "^0.19.5",
     "pg": "^7.11.0",
     "transenv": "^1.0.3"
+  },
+  "engines": {
+    "node": "12"
   }
 }
