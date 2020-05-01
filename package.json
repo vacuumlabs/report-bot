@@ -19,7 +19,8 @@
     "dev": "concurrently \"yarn workspace server dev\" \"yarn workspace client start\"",
     "eslint": "yarn workspace client eslint && yarn workspace server eslint && yarn workspace bot eslint",
     "knex": "knex --knexfile knex/knexfile.js",
-    "test": "yarn eslint"
+    "test": "yarn eslint",
+    "heroku-postbuild": "yarn build && yarn knex migrate:latest"
   },
   "husky": {
     "hooks": {

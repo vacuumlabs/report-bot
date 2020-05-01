@@ -41,7 +41,7 @@ export const authorize = async (req, res, next) => {
 export const registerAuthRoutes = (app) => {
   app.get('/auth/login', (req, res) => {
     const oauthUrl = url.format({
-      protocol: req.protocol,
+      protocol: c.isDev ? 'http' : 'https',
       host: req.headers.host,
       pathname: '/auth/callback',
     })
