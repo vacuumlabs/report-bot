@@ -1,12 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
+import config from './config'
 
 export const setupAuthentication = () => {
   const rootElement = document.getElementById('root')
 
   const redirectToLogin = () => {
-    window.location.replace(process.env.REACT_APP_LOGIN_URL)
+    window.location.replace(config.loginUrl)
   }
 
   const renderError = (message) => {

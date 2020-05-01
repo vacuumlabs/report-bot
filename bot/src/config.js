@@ -1,24 +1,13 @@
 import transenv from 'transenv'
 
 export default transenv()(({str, bool, num}) => {
-  const env = str('NODE_ENV', 'development')
-  const isDevelopment = env === 'development'
+  const isDev = str('NODE_ENV') === 'development'
 
   return {
-    env,
-    logLevel: str('LOG_LEVEL', isDevelopment ? 'debug' : 'error'),
-    knex: {
-      client: 'pg',
-      connection: {
-        host: str('DB_HOST', 'localhost'),
-        port: str('DB_PORT', 5432),
-        user: str('DB_USER', 'postgres'),
-        password: str('DB_PASSWORD', 'postgres'),
-        database: str('DB_NAME', 'report_bot'),
-      },
-      migrations: {
-        directory: 'migrations',
-      },
+    logLevel: str('LOG_LEVEL', isDev ? 'debug' : 'error'),
+    pgClient: {
+      connectionString: str('DATABASE_URL'),
+      ssl: !isDev,
     },
     slack: {
       appToken: str('SLACK_APP_TOKEN'),
