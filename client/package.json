@@ -6,6 +6,7 @@
     "build": "rm -rf build && react-scripts build",
     "clean": "rm -rf build && rm -rf node_modules",
     "eslint": "eslint src",
+    "spj": "sort-package-json",
     "start": "PORT=3001 react-scripts start"
   },
   "browserslist": {

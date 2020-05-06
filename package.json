@@ -18,9 +18,11 @@
     "clean": "rm -rf node_modules && yarn workspace client clean && yarn workspace server clean && yarn workspace bot clean",
     "dev": "concurrently \"yarn workspace server dev\" \"yarn workspace client start\"",
     "eslint": "yarn workspace client eslint && yarn workspace server eslint && yarn workspace bot eslint",
+    "heroku-postbuild": "yarn build && yarn knex migrate:latest",
     "knex": "knex --knexfile knex/knexfile.js",
-    "test": "yarn eslint",
-    "heroku-postbuild": "yarn build && yarn knex migrate:latest"
+    "spj": "sort-package-json && yarn workspace client spj && yarn workspace server spj && yarn workspace bot spj",
+    "spj-check": "sort-package-json --check && yarn workspace client spj --check && yarn workspace server spj --check && yarn workspace bot spj --check",
+    "test": "yarn eslint && yarn spj-check"
   },
   "husky": {
     "hooks": {
@@ -32,6 +34,7 @@
     "husky": "^3.0.0",
     "knex": "^0.19.5",
     "pg": "^7.11.0",
+    "sort-package-json": "^1.42.2",
     "transenv": "^1.0.3"
   },
   "engines": {
