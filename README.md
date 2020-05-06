@@ -135,7 +135,7 @@ $ yarn build
 
 ## 7 Deployment
 
-We use [Heroku](https://www.heroku.com/home) for hosting this application. When something is merged into `production` branch, it is automatically deployed. You can also deploy any branch manually from Heroku Dashboard.
+We use [Heroku](https://www.heroku.com/home) for hosting this application. When something is merged into `master` branch, it is automatically deployed. You can also deploy any branch manually from Heroku Dashboard.
 
 Important parts regards to Heroku to note:
   - in `package.json`:
@@ -143,4 +143,4 @@ Important parts regards to Heroku to note:
     - `scripts.heroku-postbuild` - what to run in build phase (instead of `scripts.build`)
   - in `Procfile`:
     - `web` - how to start web part of the application
-    - `bot` - how to start other (non-web) part of the application
+    - `bot` - how to start bot (non-web) part of the application
