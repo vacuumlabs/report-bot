@@ -25,7 +25,7 @@ Applications *Client* and *Server* are tightly coupled and have to be run simult
 $ docker run --name report-bot-db -p 127.0.0.1:5432:5432 -e POSTGRES_DB=report_bot -e POSTGRES_PASSWORD=postgres -d postgres
 ```
 
-  * If you will use some different database then you need to create `.env` file in the root directory and also in `server` directory and set up the proper settings for the database. You can get inspiration in `.env.sample` files.
+  * In the root folder, copy `.env.template` into `.env`.
 
   * When the database is running you need to run migrations:
 
@@ -65,9 +65,19 @@ $ yarn knex migrate:make create_report_table
 $ yarn knex migrate:rollback
 ```
 
-## 3 Bot application
+## 3 General info
 
-### 3.1 Set-up and running
+Project uses yarn workspaces structure. So you should run every yarn command from the root folder.
+
+To install dependencies for each part of the project, just run:
+
+```bash
+$ yarn
+```
+
+## 4 Bot application
+
+### 4.1 Set-up and running
 
   * [Create a bot for your workspace](https://get.slack.help/hc/en-us/articles/115005265703-Create-a-bot-for-your-workspace).
 
@@ -75,15 +85,15 @@ $ yarn knex migrate:rollback
     - "OAuth Access Token" starts with `xoxp` and will be called as `appToken` in our codebase,
     - "Bot User OAuth Access Token" starts with `xoxb` and will be called as `botToken` in our codebase.
 
-  * Create file `.env` in the `bot` directory with the same content as you can find in `bot/.env.template`. Then set values to variables `SLACK_APP_TOKEN` and `SLACK_BOT_TOKEN` (see the previous step).
+  * In the `bot` folder, copy `.env.template` into `.env` and fill missing values.
 
   * Go into the folder `bot` and run the application:
 
 ```bash
-$ yarn && yarn build && yarn start
+$ yarn build && yarn start
 ```
 
-### 3.2 How to use the Bot
+### 4.2 How to use the Bot
 
   * Invite the *Bot* into some public channel or private group you want to scrape its content and store them in a database:
 
@@ -99,26 +109,38 @@ $ yarn && yarn build && yarn start
 
   * To categorize the message under some tag you can use special tags in the format `:__some-tag:`.
 
-## 4 Server application
+## 5 Server application
 
-### 4.1 Set-up and running
+### 5.1 Set-up and running
 
-  * Create file `.env` in the `server` directory with the same content as you can find in `server/.env.template`. Then set values to variables `SLACK_APP_TOKEN` (see the section 3.1 above).
+  * In the `server` folder, copy `.env.template` into `.env` and fill missing values.
 
   * Go into the folder `server` and run the application:
 
 ```bash
-$ yarn && yarn build && yarn start
+$ yarn build && yarn start
 ```
 
   * Then you can run the Client application (see the following section).
 
-## 5 Client application
+## 6 Client application
 
-### 5.1 Set-up and running
+### 6.1 Set-up and running
 
-  * Got into the folder `client` and run the application:
+  * Go into the folder `client` and run the application:
 
 ```bash
-$ yarn && yarn build && yarn start
+$ yarn build
 ```
+
+## 7 Deployment
+
+We use [Heroku](https://www.heroku.com/home) for hosting this application. When something is merged into `master` branch, it is automatically deployed. You can also deploy any branch manually from Heroku Dashboard.
+
+Important parts regards to Heroku to note:
+  - in `package.json`:
+    - `engines.node` - which Node version to use
+    - `scripts.heroku-postbuild` - what to run in build phase (instead of `scripts.build`)
+  - in `Procfile`:
+    - `web` - how to start web part of the application
+    - `bot` - how to start bot (non-web) part of the application

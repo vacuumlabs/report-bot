@@ -1,16 +1,12 @@
 const transenv = require('transenv').default
 
 exports.default = transenv()(({str, bool, num}) => {
+  const isDev = str('NODE_ENV') === 'development'
+
   return {
     knex: {
       client: 'pg',
-      connection: {
-        host: str('DB_HOST', 'localhost'),
-        port: str('DB_PORT', 5432),
-        user: str('DB_USER', 'postgres'),
-        password: str('DB_PASSWORD', 'postgres'),
-        database: str('DB_NAME', 'report_bot'),
-      },
+      connection: `${str('DATABASE_URL')}${isDev ? '' : '?ssl=true'}`,
       migrations: {
         directory: 'migrations',
       },
