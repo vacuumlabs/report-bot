@@ -3,7 +3,7 @@ import {RTMClient} from '@slack/rtm-api'
 import {WebClient} from '@slack/web-api'
 import logger from './logger'
 import config from './config'
-import {upsertReport, deleteReport, setTags, clearTags, getLatestReportsByChannel} from './db'
+import {upsertReport, deleteReport, setTags, clearTags, getLatestReportsByChannel, archive} from './db'
 import {getTags, handleCommands} from './commands'
 
 const {appToken, botToken} = config.slack
@@ -28,6 +28,9 @@ const addMessage = async (event) => {
 
   if (tags.length) {
     await setTags(ts, tags, isCommand)
+    if (!isCommand) {
+      await archive(tags, false, ts) // unarchive tags
+    }
   }
 }
 
