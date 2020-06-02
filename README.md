@@ -107,6 +107,18 @@ $ yarn build && yarn start
 /remove @ReportBot 
 ```
 
+  * If you want to (un)archive some projects you can run the command:
+
+```
+(un)archive [tag1] [tag2] ... [tagN]
+```
+
+  * If you want to change project's name to red, if there was no activity from set period (default is 16 days), you can run the command:
+
+```
+frequency [tag1] [frequency1] [tag2] [frequency2] ... [tagN] [frequency2]
+```
+
   * To categorize the message under some tag you can use special tags in the format `:__some-tag:`.
 
 ## 5 Server application
