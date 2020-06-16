@@ -16,7 +16,7 @@ const web = new WebClient(config.slack.appToken)
 
 const indexById = (array) => {
   return array.reduce(
-    (acc, row) => Object.assign(acc, {[row.id]: row}),
+    (acc, row) => row ? Object.assign(acc, {[row.id]: row}) : acc,
     Object.create(null)
   )
 }
@@ -26,8 +26,12 @@ const users = cache.create(async (user) => {
   return {...u.profile, id: user}
 })
 const channels = cache.create(async (channel) => {
-  const c = await web.conversations.info({channel})
-  return c.channel
+  const c = await web.conversations.info({channel}).catch((error) => {
+    if (error.data.error !== 'channel_not_found') {
+      throw error
+    }
+  })
+  return c ? c.channel : null
 })
 const emojis = cache.create(() => web.emoji.list())
 
