@@ -22,8 +22,12 @@ const indexById = (array) => {
 }
 
 const users = cache.create(async (user) => {
-  const u = await web.users.profile.get({user})
-  return {...u.profile, id: user}
+  const u = await web.users.profile.get({user}).catch((error) => {
+    if (error.data.error !== 'user_not_found') {
+      throw error
+    }
+  })
+  return u ? {...u.profile, id: user} : null
 })
 const channels = cache.create(async (channel) => {
   const c = await web.conversations.info({channel}).catch((error) => {

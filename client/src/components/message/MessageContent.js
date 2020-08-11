@@ -40,7 +40,10 @@ class MessageContent extends Component {
       code: ({text}, k) => rich ? <code key={k}>{text}</code> : text,
       emoji: ({id}, k) => <Emoji name={id} customEmojis={customEmojis} key={k}/>,
       user: ({id}, k) => {
-        const name = `@${users[id].display_name}`
+        if (!users[id]) {
+          return `@${id}`
+        }
+        const name = `@${users[id].display_name || users[id].real_name}`
         return rich
           ? <Link className="userLink" to={routes.user(id)} key={k}>{name}</Link>
           : name
