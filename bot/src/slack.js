@@ -3,12 +3,37 @@ import {RTMClient} from '@slack/rtm-api'
 import {WebClient} from '@slack/web-api'
 import logger from './logger'
 import config from './config'
-import {upsertReport, deleteReport, setTags, clearTags, getLatestReportsByChannel, archive} from './db'
+import {upsertReport, updateReport, deleteReport, isReport, setTags, clearTags, getLatestReportsByChannel, archive} from './db'
 import {getTags, handleCommands} from './commands'
 
 const {appToken, botToken} = config.slack
 const rtm = new RTMClient(botToken)
 const web = new WebClient(appToken)
+
+const addThreadMessages = async (channel, thread_ts) => {
+  await Promise.all(
+    (await loadReplies(channel, thread_ts))
+      .map(({ts, user, text: message}) => upsertReport({
+        ts,
+        user,
+        message,
+        channel,
+        response_to: thread_ts,
+      }))
+  )
+}
+
+const addThreadRootMessage = async (channel, ts) => {
+  const channel_history = await web.conversations.history({
+    channel,
+    oldest: ts,
+    latest: ts,
+    inclusive: true,
+  })
+  const {text: message, user} = channel_history.messages[0]
+
+  await upsertReport({ts, user, message, channel})
+}
 
 const addMessage = async (event) => {
   const {channel, text: message, thread_ts, ts, user} = event
@@ -18,13 +43,18 @@ const addMessage = async (event) => {
     user,
     message,
     channel,
-    response_to: thread_ts || null,
+    response_to: thread_ts,
   }
 
-  await upsertReport(report)
+  const tags = getTags(message)
+  if (tags.length && thread_ts && thread_ts !== ts) {
+    await addThreadRootMessage(channel, thread_ts)
+  }
+  if (tags.length || (thread_ts && await isReport(thread_ts))) {
+    await upsertReport(report)
+  }
 
   const isCommand = await handleCommands({message, channel, ts}, web)
-  const tags = getTags(message)
 
   if (tags.length) {
     await setTags(ts, tags, isCommand)
@@ -35,7 +65,7 @@ const addMessage = async (event) => {
 }
 
 const updateMessage = async (event) => {
-  const {message: {text: message, ts}, channel, ts: eventTs} = event
+  const {message: {text: message, user, ts, thread_ts}, channel, ts: eventTs} = event
 
   await web.reactions.remove({
     token: botToken,
@@ -48,11 +78,31 @@ const updateMessage = async (event) => {
     }
   })
 
-  await upsertReport({ts, message})
+  const tags = getTags(message)
+
+  if (tags.length) {
+    if (thread_ts) {
+      if (thread_ts === ts) {
+        // the root of a thread is potentially becoming report now -> save all replies
+        await upsertReport({ts, user, message, channel})
+        await addThreadMessages(channel, thread_ts)
+      } else {
+        // a reply is potentially becoming report now -> save the thread root
+        await addThreadRootMessage(channel, thread_ts)
+        await upsertReport({ts, user, message, channel, response_to: thread_ts})
+      }
+    } else {
+      await upsertReport({ts, user, message, channel})
+    }
+  } else {
+    // update message only if it's already in the DB
+    // it can be the tagless root message of a thread containing a report
+    await updateReport({ts, message})
+  }
+
   await clearTags(ts)
 
   const isCommand = await handleCommands({message, channel, ts, eventTs}, web)
-  const tags = getTags(message)
 
   if (tags.length) {
     await setTags(ts, tags, isCommand)
