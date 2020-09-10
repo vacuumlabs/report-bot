@@ -16,8 +16,24 @@ export async function upsertReport({
   )
 }
 
+export async function updateReport({ts, message}) {
+  return await db.query(
+    'UPDATE "report" SET message = $2 WHERE ts = $1',
+    [ts, message]
+  )
+}
+
 export async function deleteReport(ts) {
   return await db.query('DELETE FROM "report" WHERE ts=$1', [ts])
+}
+
+export async function isReport(ts) {
+  return (await db.query(
+    `SELECT COUNT(*)
+     FROM report JOIN tagged on report.ts = tagged.report
+     WHERE ts=$1`,
+    [ts]
+  )).rows[0].count > 0
 }
 
 export async function getLatestReportsByChannel() {
