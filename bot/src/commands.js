@@ -3,6 +3,7 @@ import config from './config'
 import {archive, setFrequency} from './db'
 
 const tagRegexPattern = /:__([a-zA-Z0-9'_+-]+):/g
+const stateRegexPattern = /:(on-track|on-hold|at-risk|off-track):/g
 
 const commands = [
   {
@@ -34,6 +35,15 @@ export function getTags(message) {
   logger.debug('Following tags extracted from the message:\n%o', tags)
 
   return tags
+}
+
+export function getState(message) {
+  const matches = message.match(stateRegexPattern)
+  const states = matches ? matches.map((item) => item.substring(1, item.length - 1)) : []
+
+  logger.debug('Following states extracted from the message:\n%o', states)
+
+  return states.length > 0 ? states[0] : null
 }
 
 export async function handleCommands(event, web) {
