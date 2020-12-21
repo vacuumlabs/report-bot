@@ -8,7 +8,15 @@ import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import path from 'path'
 
-import {loadReports, loadReplies, loadTags} from './db.js'
+import {
+  loadReports,
+  loadReplies,
+  loadTags,
+  loadPortfolios,
+  createPortfolio,
+  deletePortfolio,
+  updateTag,
+} from './db'
 import {authorize, registerAuthRoutes} from './auth'
 import * as cache from './cache'
 
@@ -121,6 +129,23 @@ app.get('/api/reports', authorize, async (req, res) => {
   res.json(await loadReportData())
 })
 
+app.get('/api/portfolios', authorize, async (req, res) => {
+  res.json(await loadPortfolios())
+})
+
+app.post('/api/portfolios', authorize, async (req, res) => {
+  res.json(await createPortfolio(req.body.name))
+})
+
+app.delete('/api/portfolios/:name', authorize, async (req, res) => {
+  res.json(await deletePortfolio(req.params.name))
+})
+
+app.post('/api/tags', authorize, async (req, res) => {
+  const {tag, isArchived, asanaLink, portfolios} = req.body
+  res.json(await updateTag(tag, isArchived, asanaLink, portfolios))
+})
+
 // endpoints
 app.get('*', (req, res, next) => {
   res.sendFile(`${buildDir}/index.html`)
@@ -128,4 +153,3 @@ app.get('*', (req, res, next) => {
 
 loadReportData()
 app.listen(config.port, () => {logger.info(`Server started on port: ${config.port}`)})
-
