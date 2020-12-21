@@ -1,0 +1,31 @@
+.multiSelectContainer {
+  display: flex;
+
+  .multiSelect {
+    width: calc(100% - 40px);
+  }
+
+  .settings {
+    color: #ffffff;
+    width: 24px;
+    margin: 0px 16px;
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
+  .settings:hover {
+    opacity: 1;
+  }
+
+  .dropdown-container {
+    border: 1px solid #7991a6;
+  }
+
+  .dropdown-heading-value > span {
+    color: #757575 !important;
+  }
+
+  .dropdown-content {
+    color: #757575 !important;
+  }
+}
