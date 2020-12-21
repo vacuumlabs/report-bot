@@ -35,8 +35,10 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-loader-spinner": "^2.3.0",
+    "react-multi-select-component": "^3.0.7",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
+    "react-switch": "^5.0.1",
     "transenv": "^1.0.3"
   },
   "proxy": "http://localhost:5000"
