@@ -1,0 +1,118 @@
+.Modal {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(#ffffff, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .modal {
+    width: 400px;
+    border-radius: 24px;
+    padding: 32px;
+    color: #ffffff;
+    background-color: #253442;
+    max-height: 700px;
+
+    .topContainer {
+      display: flex;
+      justify-content: space-between;
+
+      .title {
+        font-size: 30px;
+      }
+
+      .closeContainer {
+        position: relative;
+      }
+
+      .close {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        width: 32px;
+        height: 32px;
+        opacity: 0.5;
+      }
+
+      .close:hover {
+        opacity: 1;
+        cursor: pointer;
+      }
+
+      .close:before,
+      .close:after {
+        position: absolute;
+        left: 15px;
+        content: " ";
+        height: 32px;
+        width: 4px;
+        background-color: #ffffff;
+      }
+
+      .close:before {
+        transform: rotate(45deg);
+      }
+
+      .close:after {
+        transform: rotate(-45deg);
+      }
+    }
+
+    .modalContentContainer {
+      margin-top: 48px;
+      margin-bottom: 48px;
+
+      .modalContent {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+    }
+
+    .saveContainer {
+      display: flex;
+      justify-content: flex-end;
+
+      .loading {
+        margin: 0px 40px;
+      }
+
+      .resultMessage {
+        width: calc(100% - 120px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .success {
+          color: #1fbe9c;
+        }
+
+        .error {
+          color: #eb495b;
+        }
+      }
+
+      .save {
+        font-family: "Lato", sans-serif;
+        font-size: 16px;
+        padding: 10px;
+        border-radius: 8px;
+        border: 0px;
+        width: 120px;
+        background-color: #4b5967;
+        color: #ffffff;
+        cursor: pointer;
+      }
+
+      .disabled {
+        opacity: 0.5;
+        color: #7991a6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
