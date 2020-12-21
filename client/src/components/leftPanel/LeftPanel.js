@@ -1,40 +1,84 @@
 import React, { Component } from 'react'
+import { withRouter } from 'react-router-dom'
 import _ from 'lodash'
-import vacuumLogo from '../../assets/vacuum-logo-light.svg'
 import moment from 'moment'
+
+import './LeftPanel.scss'
+import vacuumLogo from '../../assets/vacuum-logo-light.svg'
 import {parseTs} from '../../utils/helpers'
 import Tag from './Tag'
-import './LeftPanel.scss'
+import PortfoliosSelect from './PortfoliosSelect'
 
+
+
+function getPortfoliosFromSearchQuery(searchQuery) {
+  if (!searchQuery) return []
+  const splitSearchQuery = searchQuery.split('?portfolios=')
+  if (splitSearchQuery.length > 0) {
+    return splitSearchQuery[1].split(',').map((p) => ({label: p, value: p}))
+  }
+  return []
+} 
 class LeftPanel extends Component {
 
   state = {
     searchString: "",
+    portfolios: getPortfoliosFromSearchQuery(this.props.location.search),
     showArchived: false,
+    detailedView: true
   }
 
   onSearchChange = (event) => this.setState({ searchString: event.target.value })
   
-  onShowArchivedChange = (event) => this.setState({showArchived: event.target.checked})
+  onPortfoliosChange = (portfolios) => {
+    this.setState({ portfolios })
+    const searchQuery = portfolios.length > 0 ? `?portfolios=${encodeURI(portfolios.map(p => p.value))}` : ''
+    this.props.history.push(`${this.props.location.pathname}${searchQuery}`)
+  }
+
+  onShowArchivedChange = (event) => this.setState({ showArchived: event.target.checked })
+
+  toggleDetailedView = () => this.setState({ detailedView: !this.state.detailedView })
 
   render() {
-    const {tags} = this.props
+    const {tags, users, reports, portfolioOptions} = this.props
     for (const tag of tags) {
       tag.isLate =
         !tag.isArchived && moment().diff(parseTs(tag.lastTs), 'days') > tag.frequency
     }
     const partitionedTags = _.flatten(_.partition(tags, 'isLate'))
-    const {searchString, showArchived} = this.state
-    const lowerCaseSearchString = searchString.trim().toLowerCase();
-
+    const {searchString, portfolios, showArchived, detailedView} = this.state
+    const portfoliosValues = portfolios.map((p) => p.value)
+    const lowerCaseSearchString = searchString.trim().toLowerCase()
+    const filteredTags = partitionedTags.filter(
+      ({tag, portfolios: tagPortfolios, isArchived}) =>
+        tag.toLowerCase().includes(lowerCaseSearchString) &&
+        (portfolios.length === 0 || !_.isEmpty(_.intersection(portfoliosValues, tagPortfolios))) &&
+        (searchString || !isArchived || showArchived)
+    )
     return (
-      <div className={`LeftPanelContainer${searchString ? '' : ' padded'}`}>
+      <div className={`LeftPanelContainer${searchString ? '' : ' padded'}${detailedView ? ' detailed' : ''}`}>
         <div className="LeftPanel">
-          <a href='/'>
+          <a href='/' className="logoContainer">
             <img className="logo" src={vacuumLogo} alt="VacuumLabs logo" />
           </a>
-          <strong className="sectionTitle">Select tag</strong>
-          <QuickSearch value={searchString} onChange={this.onSearchChange} />
+          <div className="optionsBar">
+            <div className="searchBars">
+              <QuickSearch value={searchString} onChange={this.onSearchChange} />
+              {detailedView && (
+                <PortfoliosSelect
+                    options={portfolioOptions}
+                    value={portfolios}
+                    onChange={this.onPortfoliosChange}
+                    placeholder="Filter by portfolios..."
+                    showSettings
+                  />
+              )}
+            </div>
+            <div onClick={this.toggleDetailedView} className="detailViewButton">
+              <i className={`arrow ${detailedView ? 'left' : 'right'}`} />
+            </div>
+          </div>
           {!searchString && (
 	          <ShowArchivedBox
 		          label="show archived projects"
@@ -43,14 +87,13 @@ class LeftPanel extends Component {
 	          />
           )}
           <ul>
-            {partitionedTags
-              .filter(
-                ({tag, isArchived}) =>
-                  tag.toLowerCase().includes(lowerCaseSearchString) &&
-                  (searchString || !isArchived || showArchived)
-              )
-              .map((tag) => (<Tag key={tag.tag} tag={tag} />))
-            }
+            {filteredTags.map((tag) => (<Tag 
+              key={tag.tag}
+              tag={tag}
+              detailedView={detailedView}
+              users={users}
+              reports={reports}
+            />))}
           </ul>
         </div>
       </div>
@@ -64,7 +107,7 @@ function QuickSearch({value, onChange}) {
       type="text"
       value={value}
       onChange={onChange}
-      placeholder="search"
+      placeholder="Search tag..."
     />
   )
 }
@@ -82,4 +125,4 @@ function ShowArchivedBox({label, isChecked, onChange}) {
   )
 }
 
-export default LeftPanel
+export default withRouter(LeftPanel)
