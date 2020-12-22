@@ -24,9 +24,8 @@ class App extends Component {
   }
 
   async componentDidMount() {
-    await this.loadReports()
+    await Promise.all([this.loadReports(), this.loadPortfolioOptions()])
     this.refreshInterval = setInterval(this.loadReports, 5 * 60 * 1000)
-    await this.loadPortfolioOptions()
   }
 
   componentWillUnmount() {

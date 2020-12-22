@@ -29,7 +29,7 @@ class TagEdit extends Component {
 	}
 
   onSubmit = async () => {
-    const { tag } = this.props
+    const { tag, loadReports } = this.props
     const { isArchived, asanaLink, portfolios } = this.state
     const data = {
       tag: tag.tag,
@@ -40,7 +40,7 @@ class TagEdit extends Component {
 
     this.setState({ loading: true })
     const result = await updateTag(data)
-    await this.props.loadReports() // refresh tag list after update
+    await loadReports() // refresh tag list after update
     this.setState({ loading: false })
     this.setState({ resultType: result?.name === 'error' ? 'error' : 'success' })
   }

@@ -31,19 +31,40 @@ export async function loadReplies() {
 export async function loadTags() {
   return (
     await db.query(
-      `SELECT tag, count, lastTs as "lastTs", is_archived AS "isArchived", frequency, 
-            t.state, tg.asana_link AS "asanaLink", p.portfolios 
-      FROM (SELECT t1.tag, t2.state, t1.count, t1.lastTs
-            FROM (SELECT tag, Count(*) AS count, Max(report) AS lastTs
-                  FROM   tagged 
-                  WHERE  NOT is_command 
-                  GROUP  BY tag) t1 
-            INNER JOIN tagged t2 ON t1.lastTs=t2.report) t 
-      NATURAL JOIN tag tg
-      LEFT JOIN (SELECT tag AS tag, array_agg(portfolio) AS portfolios 
-      FROM tag_portfolio 
-      GROUP BY tag) p USING (tag) 
-      ORDER BY tag ASC`
+      `-- collect all data together
+      SELECT t1.last_report_ts AS "lastTs", tagged.tag, t3.state,
+        tag.asana_link as "asanaLink", tag.is_archived AS "isArchived",
+        t1.count, portfolios
+      FROM tagged 
+      JOIN (
+        -- get the most recent reports
+        SELECT tag, max(report) last_report_ts, count(*) count
+        FROM tagged 
+        group by tag
+      ) t1 ON (tagged.report = t1.last_report_ts and tagged.tag = t1.tag)
+      LEFT JOIN (
+        -- get the most recent states
+        SELECT tagged.tag, tagged.state FROM tagged JOIN (
+          -- get the most recent tags containing state
+          SELECT tag, max(report) last_state_ts 
+            FROM (
+              -- find all tags with states
+              SELECT tag, report 
+              FROM tagged 
+              where state is not null
+            ) t1
+            group by tag
+        ) t2 ON (t2.last_state_ts = tagged.report and t2.tag = tagged.tag)
+      ) t3 ON (t3.tag = tagged.tag)
+      -- add tag info to the collection
+      JOIN tag on (tagged.tag = tag.tag)
+      LEFT JOIN (
+        -- add portfolios to the collection
+        SELECT tag, array_agg(portfolio) AS portfolios 
+        FROM tag_portfolio 
+        group by tag
+      ) t4
+      ON (tag.tag = t4.tag)`
     )
   ).rows
 }
