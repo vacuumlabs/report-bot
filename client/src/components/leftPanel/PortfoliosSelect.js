@@ -9,21 +9,16 @@ export function portfolioStringsToObjects(portfolioStrings) {
 	return portfolioStrings ? portfolioStrings.map((p) => ({ label: p, value: p })) : []
 }
 
-function PortfoliosSelect({value, onChange, options, placeholder, showSettings, history}) {
-	
-	const onSettingsClick = () => {
-    history.push(`/editPortfolios`)
-	}
-	
+function PortfoliosSelect({value, onChange, options, placeholder, showSettings, onSettingsClick}) {	
 	return (<div className="multiSelectContainer">
 		<MultiSelect
-			className="multiSelect"
+			className={showSettings ? 'multiSelectShort' : 'multiSelect'}
 			options={options}
 			value={value}
 			onChange={onChange}
 			overrideStrings={{ "selectSomeItems": placeholder }}
 		/>
-		{showSettings && (
+		{showSettings && onSettingsClick && (
 			<img 
 				src={settingsIcon}
 				className="settings"

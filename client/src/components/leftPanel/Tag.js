@@ -9,8 +9,17 @@ import './Tag.scss'
 
 class Tag extends Component {
   render() {
-    const {tag, count, lastTs, isArchived, isLate, state, portfolios, asanaLink} = this.props.tag
-    const {detailedView, users, reports} = this.props
+    const {
+      tag,
+      count,
+      lastTs,
+      isArchived,
+      isLate,
+      state,
+      portfolios,
+      asanaLink
+    } = this.props.tag
+    const {detailedView, users, reports, onOpenTagEdit} = this.props
     return (
       <li className="listItem">
         <RouterLink className={`tagLink${isLate?' late':''}`} to={`/${encodeURI(tag)}`}>
@@ -28,7 +37,10 @@ class Tag extends Component {
           </div>}
         </RouterLink>
         {detailedView && <AsanaLink asanaLink={asanaLink} />}
-        <EditLink tag={tag} />
+        <EditLink
+          tag={tag}
+          onOpenTagEdit={onOpenTagEdit}
+        />
       </li>
     )
   }
@@ -92,14 +104,12 @@ const AsanaLink = ({asanaLink}) => {
   </div>)
 }
 
-const EditLink = ({tag}) => {
-  return (<div className="edit">
-    <RouterLink to={`/${encodeURI(tag)}/edit`}>
-      <div className="tooltipContainer">
-        <img src={editIcon} alt="edit" />
-        <div className="tooltip">Edit {tag}</div>
-      </div>
-    </RouterLink>
+const EditLink = ({tag, onOpenTagEdit}) => {
+  return (<div className="edit" onClick={() => onOpenTagEdit(tag)}>
+    <div className="tooltipContainer">
+      <img src={editIcon} alt="edit" />
+      <div className="tooltip">Edit {tag}</div>
+    </div>
   </div>)
 }
 

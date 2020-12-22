@@ -8,6 +8,8 @@ import vacuumLogo from '../../assets/vacuum-logo-light.svg'
 import {parseTs} from '../../utils/helpers'
 import Tag from './Tag'
 import PortfoliosSelect from './PortfoliosSelect'
+import EditPortfolios from './EditPortfolios'
+import TagEdit from './TagEdit'
 
 
 
@@ -25,7 +27,12 @@ class LeftPanel extends Component {
     searchString: "",
     portfolios: getPortfoliosFromSearchQuery(this.props.location.search),
     showArchived: false,
-    detailedView: true
+    detailedView: true,
+    isEditPortfoliosOpen: false,
+    isTagEditOpen: this.props.tags.reduce((acc, tag) => ({
+      ...acc,
+      [tag.tag]: false
+    }), {})
   }
 
   onSearchChange = (event) => this.setState({ searchString: event.target.value })
@@ -36,18 +43,26 @@ class LeftPanel extends Component {
     this.props.history.push(`${this.props.location.pathname}${searchQuery}`)
   }
 
+  onCloseTagEdit = (tagName) => {
+    this.setState({isTagEditOpen: {...this.state.isTagEditOpen, [tagName]: false}})
+  }
+
+  onOpenTagEdit = (tagName) => {
+    this.setState({isTagEditOpen: {...this.state.isTagEditOpen, [tagName]: true}})
+  }
+
   onShowArchivedChange = (event) => this.setState({ showArchived: event.target.checked })
 
   toggleDetailedView = () => this.setState({ detailedView: !this.state.detailedView })
 
   render() {
-    const {tags, users, reports, portfolioOptions} = this.props
+    const {tags, users, reports, portfolioOptions, loadReports, loadPortfolioOptions} = this.props
+    const {searchString, portfolios, showArchived, detailedView, isEditPortfoliosOpen, isTagEditOpen} = this.state
     for (const tag of tags) {
       tag.isLate =
         !tag.isArchived && moment().diff(parseTs(tag.lastTs), 'days') > tag.frequency
     }
     const partitionedTags = _.flatten(_.partition(tags, 'isLate'))
-    const {searchString, portfolios, showArchived, detailedView} = this.state
     const portfoliosValues = portfolios.map((p) => p.value)
     const lowerCaseSearchString = searchString.trim().toLowerCase()
     const filteredTags = partitionedTags.filter(
@@ -58,6 +73,12 @@ class LeftPanel extends Component {
     )
     return (
       <div className={`LeftPanelContainer${searchString ? '' : ' padded'}${detailedView ? ' detailed' : ''}`}>
+        {isEditPortfoliosOpen && <EditPortfolios
+          onClose={() => this.setState({isEditPortfoliosOpen: false})}
+          portfolioOptions={portfolioOptions}
+          loadReports={loadReports}
+          loadPortfolioOptions={loadPortfolioOptions}
+        />}
         <div className="LeftPanel">
           <a href='/' className="logoContainer">
             <img className="logo" src={vacuumLogo} alt="VacuumLabs logo" />
@@ -67,12 +88,13 @@ class LeftPanel extends Component {
               <QuickSearch value={searchString} onChange={this.onSearchChange} />
               {detailedView && (
                 <PortfoliosSelect
-                    options={portfolioOptions}
-                    value={portfolios}
-                    onChange={this.onPortfoliosChange}
-                    placeholder="Filter by portfolios..."
-                    showSettings
-                  />
+                  options={portfolioOptions}
+                  value={portfolios}
+                  onChange={this.onPortfoliosChange}
+                  placeholder="Filter by portfolios..."
+                  showSettings
+                  onSettingsClick={() => this.setState({isEditPortfoliosOpen: true})}
+                />
               )}
             </div>
             <div onClick={this.toggleDetailedView} className="detailViewButton">
@@ -86,10 +108,20 @@ class LeftPanel extends Component {
 		          onChange={this.onShowArchivedChange}
 	          />
           )}
+          {filteredTags.map((tag) => (isTagEditOpen[tag.tag] && <TagEdit
+            key={tag.tag}
+            tag={tag}
+            onClose={this.onCloseTagEdit}
+            isArchived={tag.isArchived}
+            asanaLink={tag.asanaLink}
+            portfolioOptions={portfolioOptions}
+            loadReports={loadReports}
+          />))}
           <ul>
             {filteredTags.map((tag) => (<Tag 
               key={tag.tag}
               tag={tag}
+              onOpenTagEdit={this.onOpenTagEdit}
               detailedView={detailedView}
               users={users}
               reports={reports}

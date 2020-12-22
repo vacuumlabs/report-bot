@@ -19,15 +19,6 @@ class TagEdit extends Component {
     resultType: '',
   }
 
-  onClose = () => {
-    if (this.props.history.length > 2) {
-      this.props.history.goBack()
-    } else {
-      // in case tag edit was first visited site
-      this.props.history.push(`/${encodeURI(this.props.tag.tag)}`)
-    }
-	}
-
   onSubmit = async () => {
     const { tag, loadReports } = this.props
     const { isArchived, asanaLink, portfolios } = this.state
@@ -54,20 +45,20 @@ class TagEdit extends Component {
   }
 
   render() {
-    const { tag, portfolioOptions } = this.props
+    const { tag, portfolioOptions, onClose } = this.props
     const { isArchived, asanaLink, portfolios, loading, resultType } = this.state
     return (<Modal
-        title={`Edit ${tag.tag}`}
-        onClose={this.onClose}
-        onSubmit={this.onSubmit}
-        loading={loading}
-        resultType={resultType}
-        resultMessage={
-          resultType === 'error' ?
-            'Tag could not be updated.' : resultType === 'success' ?
-              'Tag updated successfully.' : ''}
-        disabledButton={this.isFormChanged()}
-      >
+      title={`Edit ${tag.tag}`}
+      onClose={() => onClose(tag.tag)}
+      onSubmit={this.onSubmit}
+      loading={loading}
+      resultType={resultType}
+      resultMessage={
+        resultType === 'error' ?
+          'Tag could not be updated.' : resultType === 'success' ?
+            'Tag updated successfully.' : ''}
+      disabledButton={this.isFormChanged()}
+    >
       <div className="formGroup">
         <div className="label">
           Portfolios
@@ -77,7 +68,6 @@ class TagEdit extends Component {
           value={portfolios}
           onChange={(portfolios) => this.setState({portfolios})}
           placeholder="Choose portfolios..."
-          showSettings
         />
       </div>
       <div className="formGroup">

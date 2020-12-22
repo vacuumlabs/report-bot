@@ -16,10 +16,6 @@ class EditPortfolios extends Component {
     resultType: ''
   }
 
-  onClose = () => {
-    this.props.history.push(`/`)
-  }
-
   onAddInputChange = (e) => {
     this.setState({resultType: ''}) // reset success/error
     this.setState({addInput: e.target.value})
@@ -45,12 +41,12 @@ class EditPortfolios extends Component {
   }
 
   render() {
-    const {portfolioOptions} = this.props
+    const {portfolioOptions, onClose} = this.props
     const {addInput, deleteSearchInput, resultType, loading} = this.state
     const disabledButton = addInput.length < 2 || portfolioOptions.map((p) => p.label).includes(addInput)
     return (<Modal
       title="Edit portfolios"
-      onClose={this.onClose}
+      onClose={onClose}
       onSubmit={this.onSubmit}
     >
       <div className="formGroup">

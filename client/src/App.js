@@ -3,8 +3,6 @@ import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom'
 
 import {getTags, getReportData, getPortfolios} from './utils/serverApi'
 import LeftPanel from './components/leftPanel/LeftPanel'
-import TagEdit from './components/leftPanel/TagEdit'
-import EditPortfolios from './components/leftPanel/EditPortfolios'
 import Content from './components/content/Content'
 import {Loader} from './components/ui'
 import './App.scss'
@@ -45,29 +43,11 @@ class App extends Component {
             users={reportData.users}
             reports={reportData.reports}
             portfolioOptions={portfolioOptions}
+            loadReports={this.loadReports}
+            loadPortfolioOptions={this.loadPortfolioOptions}
           />
           <Switch>
             <Redirect exact from='/' to={`/${encodeURI(tags[0].tag)}`} />
-            <Route exact path='/editPortfolios' render={() => (
-              <EditPortfolios 
-                portfolioOptions={portfolioOptions}
-                loadReports={this.loadReports}
-                loadPortfolioOptions={this.loadPortfolioOptions}
-              />
-            )} />
-            <Route exact path='/:tag/edit' render={(props) => { 
-              const tagName = decodeURI(props.match.params.tag)
-              const filteredTags = tags.filter((t) => t.tag === tagName)
-              const tag = filteredTags.length ? filteredTags[0] : null
-              return tag ? (
-                <TagEdit
-                  tag={tag}
-                  portfolioOptions={portfolioOptions}
-                  loadReports={this.loadReports}
-                />) : (
-                <div className="info">Unknown tag.</div>
-              )
-            }} />
             <Route path='/:tag' render={(props) => {
               const tag = decodeURI(props.match.params.tag)
               const {reports, users, channels, emoji} = reportData
