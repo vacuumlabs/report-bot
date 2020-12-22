@@ -105,7 +105,7 @@ const AsanaLink = ({asanaLink}) => {
 }
 
 const EditLink = ({tag, onOpenTagEdit}) => {
-  return (<div className="edit" onClick={() => onOpenTagEdit(tag)}>
+  return (<div className="edit" onClick={onOpenTagEdit}>
     <div className="tooltipContainer">
       <img src={editIcon} alt="edit" />
       <div className="tooltip">Edit {tag}</div>

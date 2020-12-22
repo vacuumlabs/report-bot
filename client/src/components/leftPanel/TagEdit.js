@@ -49,7 +49,7 @@ class TagEdit extends Component {
     const { isArchived, asanaLink, portfolios, loading, resultType } = this.state
     return (<Modal
       title={`Edit ${tag.tag}`}
-      onClose={() => onClose(tag.tag)}
+      onClose={onClose}
       onSubmit={this.onSubmit}
       loading={loading}
       resultType={resultType}

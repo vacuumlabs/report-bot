@@ -29,10 +29,7 @@ class LeftPanel extends Component {
     showArchived: false,
     detailedView: true,
     isEditPortfoliosOpen: false,
-    isTagEditOpen: this.props.tags.reduce((acc, tag) => ({
-      ...acc,
-      [tag.tag]: false
-    }), {})
+    tagEditOpen: ''
   }
 
   onSearchChange = (event) => this.setState({ searchString: event.target.value })
@@ -43,21 +40,13 @@ class LeftPanel extends Component {
     this.props.history.push(`${this.props.location.pathname}${searchQuery}`)
   }
 
-  onCloseTagEdit = (tagName) => {
-    this.setState({isTagEditOpen: {...this.state.isTagEditOpen, [tagName]: false}})
-  }
-
-  onOpenTagEdit = (tagName) => {
-    this.setState({isTagEditOpen: {...this.state.isTagEditOpen, [tagName]: true}})
-  }
-
   onShowArchivedChange = (event) => this.setState({ showArchived: event.target.checked })
 
   toggleDetailedView = () => this.setState({ detailedView: !this.state.detailedView })
 
   render() {
     const {tags, users, reports, portfolioOptions, loadReports, loadPortfolioOptions} = this.props
-    const {searchString, portfolios, showArchived, detailedView, isEditPortfoliosOpen, isTagEditOpen} = this.state
+    const {searchString, portfolios, showArchived, detailedView, isEditPortfoliosOpen, tagEditOpen} = this.state
     for (const tag of tags) {
       tag.isLate =
         !tag.isArchived && moment().diff(parseTs(tag.lastTs), 'days') > tag.frequency
@@ -108,10 +97,10 @@ class LeftPanel extends Component {
 		          onChange={this.onShowArchivedChange}
 	          />
           )}
-          {filteredTags.map((tag) => (isTagEditOpen[tag.tag] && <TagEdit
+          {filteredTags.map((tag) => (tagEditOpen === tag.tag && <TagEdit
             key={tag.tag}
             tag={tag}
-            onClose={this.onCloseTagEdit}
+            onClose={() => this.setState({tagEditOpen: ''})}
             isArchived={tag.isArchived}
             asanaLink={tag.asanaLink}
             portfolioOptions={portfolioOptions}
@@ -121,7 +110,7 @@ class LeftPanel extends Component {
             {filteredTags.map((tag) => (<Tag 
               key={tag.tag}
               tag={tag}
-              onOpenTagEdit={this.onOpenTagEdit}
+              onOpenTagEdit={() => this.setState({tagEditOpen: tag.tag})}
               detailedView={detailedView}
               users={users}
               reports={reports}
