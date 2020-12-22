@@ -1,12 +1,16 @@
 .multiSelectContainer {
   display: flex;
   align-items: center;
-  
+
   .multiSelectShort {
+    min-width: 200px;
+    max-width: 400px;
     width: calc(100% - 40px);
   }
   
   .multiSelect {
+    min-width: 200px;
+    max-width: 400px;
     width: 100%;
   }
 

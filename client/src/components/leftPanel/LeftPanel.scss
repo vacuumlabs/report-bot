@@ -30,23 +30,6 @@
 
   .searchBars {
     display: flex;
-
-    .multiSelect {
-      padding: 5px;
-      width: 200px;
-
-      .dropdown-container {
-        border: 1px solid #7991a6;
-      }
-
-      .dropdown-heading-value > span {
-        color: #757575 !important;
-      }
-
-      .dropdown-content {
-        color: #757575 !important;
-      }
-    }
   }
 
   .detailViewButton {
