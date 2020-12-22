@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Link as RouterLink} from 'react-router-dom'
+import {Link as RouterLink, withRouter} from 'react-router-dom'
 
 import {parseTs} from '../../utils/helpers'
 import archivedIcon from '../../assets/archive.svg'
@@ -22,7 +22,7 @@ class Tag extends Component {
     const {detailedView, users, reports, onOpenTagEdit} = this.props
     return (
       <li className="listItem">
-        <RouterLink className={`tagLink${isLate?' late':''}`} to={`/${encodeURI(tag)}`}>
+        <RouterLink className={`tagLink${isLate?' late':''}`} to={`/${encodeURI(tag)}${this.props.location.search}`}>
           <div className="basicInfo">
             <span className="tagTitle">
               {tag} ({count})
@@ -113,4 +113,4 @@ const EditLink = ({tag, onOpenTagEdit}) => {
   </div>)
 }
 
-export default Tag
+export default withRouter(Tag)
