@@ -1,0 +1,78 @@
+.addContainer {
+  display: flex;
+
+  .addInput {
+    width: calc(100% - 100px);
+  }
+
+  .addButton {
+    width: 100px;
+    margin-left: 20px;
+    font-family: "Lato", sans-serif;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 0px;
+    background-color: #4b5967;
+    color: #ffffff;
+    cursor: pointer;
+  }
+
+  .disabled {
+    opacity: 0.5;
+    color: #7991a6;
+    cursor: not-allowed;
+  }
+}
+
+.loading {
+  margin: 0px 40px;
+}
+
+.resultMessage {
+  margin-top: 4px;
+  height: 20px;
+  .success {
+    color: #1fbe9c;
+  }
+
+  .error {
+    color: #eb495b;
+  }
+}
+
+.deleteWarning {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  color: #f0a026;
+}
+
+.deleteList {
+  height: 200px;
+  overflow-y: scroll;
+  margin-top: 16px;
+
+  .item {
+    border-bottom: 1px solid #7991a6;
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .delete {
+      color: #ffffff;
+      width: 24px;
+      margin: 0px 16px;
+      cursor: pointer;
+      opacity: 0.5;
+    }
+
+    .delete:hover {
+      opacity: 1;
+    }
+  }
+
+  .item:nth-last-child(1) {
+    border-bottom: none;
+  }
+}

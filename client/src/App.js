@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom'
 
-import {getTags, getReportData} from './utils/serverApi'
+import {getTags, getReportData, getPortfolios} from './utils/serverApi'
 import LeftPanel from './components/leftPanel/LeftPanel'
 import Content from './components/content/Content'
 import {Loader} from './components/ui'
@@ -16,8 +16,13 @@ class App extends Component {
     this.setState({tags, reportData})
   }
 
+  loadPortfolioOptions = async () => {
+    const options = await getPortfolios()
+    this.setState({ portfolioOptions: options.map((p) => ({label: p.name, value: p.name})) })
+  }
+
   async componentDidMount() {
-    await this.loadReports()
+    await Promise.all([this.loadReports(), this.loadPortfolioOptions()])
     this.refreshInterval = setInterval(this.loadReports, 5 * 60 * 1000)
   }
 
@@ -26,17 +31,24 @@ class App extends Component {
   }
 
   render() {
-    const {tags, reportData} = this.state
-    const loading = tags === undefined
+    const {tags, reportData, portfolioOptions} = this.state
+    const loading = tags === undefined || portfolioOptions === undefined
     return (
       <div className="container">
         {loading && <Loader light />}
         {!loading && tags.length === 0 && <div className="info">No tags found.</div>}
         {!loading && tags.length > 0 && <BrowserRouter>
-          <LeftPanel tags={tags} />
+          <LeftPanel 
+            tags={tags}
+            users={reportData.users}
+            reports={reportData.reports}
+            portfolioOptions={portfolioOptions}
+            loadReports={this.loadReports}
+            loadPortfolioOptions={this.loadPortfolioOptions}
+          />
           <Switch>
             <Redirect exact from='/' to={`/${encodeURI(tags[0].tag)}`} />
-            <Route exact path='/:tag' render={(props) => {
+            <Route path='/:tag' render={(props) => {
               const tag = decodeURI(props.match.params.tag)
               const {reports, users, channels, emoji} = reportData
               return tags.some((t) => t.tag === tag)

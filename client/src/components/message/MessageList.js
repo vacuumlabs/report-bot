@@ -27,9 +27,9 @@ class MessageList extends Component {
   render () {
     return (
       <div className="MessageList">
-        {this.props.reports.map (report => (
+        {this.props.reports.map ((report, i) => (
           <MessageItem
-            key={report.id}
+            key={i}
             message={report}
             users={this.props.users}
             channels={this.props.channels}

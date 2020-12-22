@@ -4,7 +4,7 @@ import {WebClient} from '@slack/web-api'
 import logger from './logger'
 import config from './config'
 import {upsertReport, updateReport, deleteReport, isReport, setTags, clearTags, getLatestReportsByChannel, archive} from './db'
-import {getTags, handleCommands} from './commands'
+import {getState, getTags, handleCommands} from './commands'
 
 const {appToken, botToken} = config.slack
 const rtm = new RTMClient(botToken)
@@ -47,6 +47,7 @@ const addMessage = async (event) => {
   }
 
   const tags = getTags(message)
+  const state = getState(message)
   if (tags.length && thread_ts && thread_ts !== ts) {
     await addThreadRootMessage(channel, thread_ts)
   }
@@ -57,7 +58,7 @@ const addMessage = async (event) => {
   const isCommand = await handleCommands({message, channel, ts}, web)
 
   if (tags.length) {
-    await setTags(ts, tags, isCommand)
+    await setTags(ts, tags, isCommand, state)
     if (!isCommand) {
       await archive(tags, false, ts) // unarchive tags
     }
@@ -79,6 +80,7 @@ const updateMessage = async (event) => {
   })
 
   const tags = getTags(message)
+  const state = getState(message)
 
   if (tags.length) {
     if (thread_ts) {
@@ -105,7 +107,7 @@ const updateMessage = async (event) => {
   const isCommand = await handleCommands({message, channel, ts, eventTs}, web)
 
   if (tags.length) {
-    await setTags(ts, tags, isCommand)
+    await setTags(ts, tags, isCommand, state)
   }
 }
 
