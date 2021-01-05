@@ -5,6 +5,7 @@ import {parseTs} from '../../utils/helpers'
 import archivedIcon from '../../assets/archive.svg'
 import asanaIcon from '../../assets/asana.svg'
 import editIcon from '../../assets/edit.svg'
+import {StateIcon} from '../ui/StateIcon'
 import './Tag.scss'
 
 class Tag extends Component {
@@ -31,7 +32,9 @@ class Tag extends Component {
             <span className="lastTs">{parseTs(lastTs).fromNow()}</span>
           </div>
           {detailedView && <div className="detailInfo">
-            <StateIcon state={state} />
+            <div className="stateIcon">
+              <StateIcon state={state} showTooltip />
+            </div>
             <Owners tag={tag} users={users} reports={reports} />
             <Portfolios portfolios={portfolios || []} />
           </div>}
@@ -44,17 +47,6 @@ class Tag extends Component {
       </li>
     )
   }
-}
-
-const StateIcon = ({state}) => {  
-  return <div className="stateContainer">
-    <div className="stateIcon">
-      <div className="tooltipContainer">
-        <div className={`state ${state}`}></div>
-        <div className="tooltip">{state}</div>
-      </div>
-    </div>
-  </div>
 }
 
 const Owners = ({tag, users, reports}) => {
@@ -73,10 +65,9 @@ const Owners = ({tag, users, reports}) => {
   return <div className="owners">
     {userIdsSorted.map((userId) => 
       <div className="owner" key={userId} >
-        <div className="tooltipContainer">
+        <span data-tip={users[userId].real_name}>
           <img src={users[userId].image_32} srcSet={`${users[userId].image_72} 2x`} alt="User Avatar" />
-          <div className="tooltip">{users[userId].real_name}</div>
-        </div>
+        </span>
       </div>
     )}
   </div>
@@ -92,24 +83,22 @@ const Portfolios = ({portfolios}) => {
 
 const AsanaLink = ({asanaLink}) => {
   return (<div className="asanaLink">
-    <div className="tooltipContainer">
-      {asanaLink ? (
-        <a href={asanaLink} target="_blank" rel="noopener noreferrer">
+    {asanaLink ? (
+      <a href={asanaLink} target="_blank" rel="noopener noreferrer">
+        <span data-tip={'Click to open Asana'}>
           <img src={asanaIcon} alt="asana" />
-        </a>) : (
+        </span>
+      </a>) : (
+      <span data-tip={'Asana link unavailable'}>
         <img src={asanaIcon} className="noLink" alt="Asana not available" />
-      )}
-      <div className="tooltip">{asanaLink ? 'Click to open Asana' : 'Asana link unavailable'}</div>
-    </div>
+      </span>
+    )}
   </div>)
 }
 
 const EditLink = ({tag, onOpenTagEdit}) => {
   return (<div className="edit" onClick={onOpenTagEdit}>
-    <div className="tooltipContainer">
-      <img src={editIcon} alt="edit" />
-      <div className="tooltip">Edit {tag}</div>
-    </div>
+    <span data-tip={`Edit ${tag}`}><img src={editIcon} alt="edit" /></span>
   </div>)
 }
 

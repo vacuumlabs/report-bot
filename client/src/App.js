@@ -1,10 +1,12 @@
 import React, {Component} from 'react'
 import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom'
+import _ from 'lodash'
 
 import {getTags, getReportData, getPortfolios} from './utils/serverApi'
 import LeftPanel from './components/leftPanel/LeftPanel'
 import Content from './components/content/Content'
 import {Loader} from './components/ui'
+import {Tooltip} from './components/ui/Tooltip'
 import './App.scss'
 
 class App extends Component {
@@ -38,6 +40,8 @@ class App extends Component {
         {loading && <Loader light />}
         {!loading && tags.length === 0 && <div className="info">No tags found.</div>}
         {!loading && tags.length > 0 && <BrowserRouter>
+          {/* Include Tooltip to be able to use data-tip on spans */}
+          <Tooltip />
           <LeftPanel 
             tags={tags}
             users={reportData.users}
@@ -51,6 +55,7 @@ class App extends Component {
             <Route path='/:tag' render={(props) => {
               const tag = decodeURI(props.match.params.tag)
               const {reports, users, channels, emoji} = reportData
+              const state = _.find(tags, (t) => t.tag === tag)?.state
               return tags.some((t) => t.tag === tag)
                 ? (<Content
                     key={tag}
@@ -59,6 +64,7 @@ class App extends Component {
                     users={users}
                     channels={channels}
                     emoji={emoji}
+                    state={state || ''}
                   />)
                 : (<div className="info">Unknown tag.</div>)
             }} />

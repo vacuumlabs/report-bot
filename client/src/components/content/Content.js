@@ -11,10 +11,10 @@ class Content extends Component {
   }
 
   render() {
-    const {tag, reports, users, channels, emoji} = this.props
+    const {tag, reports, users, channels, emoji, state} = this.props
     return (
       <div className="Content">
-        <TopPanel selectedTag={tag} customEmojis={emoji} />
+        <TopPanel selectedTag={tag} customEmojis={emoji} state={state} />
         <MessageList reports={reports} users={users} channels={channels} customEmojis={emoji} />
       </div>
     )
