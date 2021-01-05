@@ -6,7 +6,6 @@ import {getTags, getReportData, getPortfolios} from './utils/serverApi'
 import LeftPanel from './components/leftPanel/LeftPanel'
 import Content from './components/content/Content'
 import {Loader} from './components/ui'
-import {Tooltip} from './components/ui/Tooltip'
 import './App.scss'
 
 class App extends Component {
@@ -40,8 +39,6 @@ class App extends Component {
         {loading && <Loader light />}
         {!loading && tags.length === 0 && <div className="info">No tags found.</div>}
         {!loading && tags.length > 0 && <BrowserRouter>
-          {/* Include Tooltip to be able to use data-tip on spans */}
-          <Tooltip />
           <LeftPanel 
             tags={tags}
             users={reportData.users}

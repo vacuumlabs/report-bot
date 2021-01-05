@@ -6,6 +6,7 @@ import archivedIcon from '../../assets/archive.svg'
 import asanaIcon from '../../assets/asana.svg'
 import editIcon from '../../assets/edit.svg'
 import {StateIcon} from '../ui/StateIcon'
+import {Tooltip} from '../ui/Tooltip'
 import './Tag.scss'
 
 class Tag extends Component {
@@ -23,6 +24,8 @@ class Tag extends Component {
     const {detailedView, users, reports, onOpenTagEdit} = this.props
     return (
       <li className="listItem">
+        {/* Include Tooltip to be able to use data-tip on spans */}
+        <Tooltip />
         <RouterLink className={`tagLink${isLate?' late':''}`} to={`/${encodeURI(tag)}${this.props.location.search}`}>
           <div className="basicInfo">
             <span className="tagTitle">
