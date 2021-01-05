@@ -1,0 +1,21 @@
+.state {
+  width: 0px;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.state.on-track {
+  background-color: #1dbe9c;
+}
+
+.state.on-hold {
+  background-color: #178ee0;
+}
+
+.state.off-track {
+  background-color: #eb4a5b;
+}
+
+.state.at-risk {
+  background-color: #f0a026;
+}

@@ -1,4 +1,6 @@
 .TopPanel {
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
   height: 68px;
   padding: 0 40px;
@@ -10,5 +12,9 @@
   
   .title {
     color: black;
+  }
+
+  .stateIcon {
+    margin: 4px 8px 0px 8px;
   }
 }

@@ -34,7 +34,7 @@ export async function loadTags() {
       `-- collect all data together
       SELECT t1.last_report_ts AS "lastTs", tagged.tag, t3.state,
         tag.asana_link as "asanaLink", tag.is_archived AS "isArchived",
-        t1.count, portfolios
+        tag.frequency, t1.count, portfolios
       FROM tagged 
       JOIN (
         -- get the most recent reports
