@@ -34,7 +34,7 @@ export async function loadTags() {
       `-- collect all data together
       SELECT t1.last_report_ts AS "lastTs", tagged.tag, t3.state,
         tag.asana_link as "asanaLink", tag.is_archived AS "isArchived",
-        tag.frequency, t1.count, portfolios
+        tag.owner_id as "ownerId", tag.frequency, t1.count, portfolios
       FROM tagged 
       JOIN (
         -- get the most recent reports
@@ -69,13 +69,13 @@ export async function loadTags() {
   ).rows
 }
 
-export async function updateTag(tag, isArchived, asanaLink, portfolios) {
+export async function updateTag(tag, isArchived, asanaLink, ownerId, portfolios) {
   try {
     await db.query('BEGIN')
     await db.query(
-      `UPDATE tag SET is_archived=$1, asana_link=$2
-       WHERE tag=$3`,
-      [isArchived, asanaLink, tag]
+      `UPDATE tag SET is_archived=$1, asana_link=$2, owner_id=$3
+       WHERE tag=$4`,
+      [isArchived, asanaLink, ownerId, tag]
     )
     await db.query('DELETE FROM tag_portfolio WHERE tag=$1', [tag])
     const values = portfolios.map((p) => [tag, p])

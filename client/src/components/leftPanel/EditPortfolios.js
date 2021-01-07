@@ -56,7 +56,7 @@ class EditPortfolios extends Component {
         <div className="addContainer">
           <input
             type="text"
-            className="addInput"
+            className="input addInput"
             value={addInput}
             onChange={this.onAddInputChange}
             placeholder="Enter name..."
@@ -87,7 +87,7 @@ class EditPortfolios extends Component {
       <div className="formGroup">
         <input
           type="text"
-          className="deleteSearchInput"
+          className="input deleteSearchInput"
           value={deleteSearchInput}
           onChange={(e) => this.setState({deleteSearchInput: e.target.value})}
           placeholder="Search portfolio..."

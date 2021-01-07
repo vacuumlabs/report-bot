@@ -60,17 +60,23 @@
     flex: 1;
   }
 
-  .owners {
+  .ownerContainer {
     display: flex;
-    flex: 2;
+    flex: 1;
 
     .owner {
       display: flex;
-      margin-right: 8px;
+      align-items: center;
+    }
 
-      .name {
-        margin-left: 16px;
-      }
+    .message {
+      margin-left: 8px;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+    
+    .message:hover {
+      opacity: 1;
     }
   }
 }

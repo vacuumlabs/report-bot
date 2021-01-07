@@ -6,11 +6,13 @@ import Switch from 'react-switch';
 import './TagEdit.scss'
 import { updateTag } from '../../utils/serverApi'
 import Modal from './Modal';
-import PortfoliosSelect, {portfolioStringsToObjects} from './PortfoliosSelect';
+import { Select } from '../ui/Select';
+import PortfoliosSelect, { portfolioStringsToObjects } from './PortfoliosSelect';
 
 class TagEdit extends Component {
   state = {
     asanaLink: this.props.tag.asanaLink || '',
+    ownerId: this.props.tag.ownerId || '',
     portfolios: this.props.tag.portfolios?.map(
       (p) => ({ label: p, value: p })
     ) || [],
@@ -21,12 +23,13 @@ class TagEdit extends Component {
 
   onSubmit = async () => {
     const { tag, loadReports } = this.props
-    const { isArchived, asanaLink, portfolios } = this.state
+    const { isArchived, asanaLink, ownerId, portfolios } = this.state
     const data = {
       tag: tag.tag,
       isArchived,
       asanaLink,
-      portfolios: portfolios.map((p) => p.value),
+      ownerId,
+      portfolios: portfolios?.length ? portfolios.map((p) => p.value) : [],
     }
 
     this.setState({ loading: true })
@@ -37,16 +40,25 @@ class TagEdit extends Component {
   }
 
   isFormChanged = () => {
-    const {isArchived: iA_S, asanaLink: aL_S, portfolios: p_S} = this.state
-    const {isArchived: iA_T, asanaLink: aL_T, portfolios: p_T} = this.props.tag
-    const form = {isArchived: iA_S, asanaLink: aL_S, portfolios: p_S}
-    const tag = {isArchived: iA_T || false, asanaLink: aL_T || '', portfolios: portfolioStringsToObjects(p_T)}
+    const {isArchived: iA_S, asanaLink: aL_S, ownerId: oId_S, portfolios: p_S} = this.state
+    const {isArchived: iA_T, asanaLink: aL_T, ownerId: oId_T, portfolios: p_T} = this.props.tag
+    const form = {isArchived: iA_S, asanaLink: aL_S, ownerId: oId_S, portfolios: p_S}
+    const tag = {isArchived: iA_T || false, asanaLink: aL_T, ownerId: oId_T || '', portfolios: portfolioStringsToObjects(p_T)}
     return _.isEqual(form, tag)
   }
 
   render() {
-    const { tag, portfolioOptions, onClose } = this.props
-    const { isArchived, asanaLink, portfolios, loading, resultType } = this.state
+    const { tag, users, portfolioOptions, onClose } = this.props
+    const { isArchived, asanaLink, ownerId, portfolios, loading, resultType } = this.state
+    const slackUserOptions = Object.entries(users).map(([id, user]) => ({
+      value: id,
+      label: user.real_name
+    }))
+    const userSelectOptions = _.concat(
+      {value: '', label: 'No owner'},
+      _.sortBy(slackUserOptions, 'label')
+    )
+  
     return (<Modal
       title={`Edit ${tag.tag}`}
       onClose={onClose}
@@ -66,8 +78,19 @@ class TagEdit extends Component {
         <PortfoliosSelect
           options={portfolioOptions}
           value={portfolios}
-          onChange={(portfolios) => this.setState({portfolios})}
+          onChange={(portfolios) => this.setState({portfolios: portfolios || []})}
           placeholder="Choose portfolios..."
+        />
+      </div>
+      <div className="formGroup">
+        <div className="label">
+          Owner
+        </div>
+        <Select 
+          value={_.find(userSelectOptions, (option) => option.value === ownerId)}
+          onChange={(option) => this.setState({ownerId: option ? option.value : ''})}
+          placeholder="Choose an owner..."
+          options={userSelectOptions}
         />
       </div>
       <div className="formGroup">
@@ -75,6 +98,7 @@ class TagEdit extends Component {
           Link to Asana
         </div>
         <input
+          className="input"
           type="text"
           value={asanaLink}
           onChange={(e) => this.setState({asanaLink: e.target.value})}

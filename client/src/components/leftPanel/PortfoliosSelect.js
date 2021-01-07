@@ -1,9 +1,9 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
-import MultiSelect from 'react-multi-select-component'
 
-import './PortfoliosSelect.scss'
+import { Select } from '../ui/Select'
 import settingsIcon from '../../assets/settings.svg'
+import './PortfoliosSelect.scss'
 
 export function portfolioStringsToObjects(portfolioStrings) {
 	return portfolioStrings ? portfolioStrings.map((p) => ({ label: p, value: p })) : []
@@ -11,21 +11,23 @@ export function portfolioStringsToObjects(portfolioStrings) {
 
 function PortfoliosSelect({value, onChange, options, placeholder, showSettings, onSettingsClick}) {	
 	return (<div className="multiSelectContainer">
-		<MultiSelect
-			className={showSettings ? 'multiSelectShort' : 'multiSelect'}
-			options={options}
-			value={value}
-			onChange={onChange}
-			overrideStrings={{ "selectSomeItems": placeholder }}
-		/>
-		{showSettings && onSettingsClick && (
-			<img 
-				src={settingsIcon}
-				className="settings"
-				alt="settings"
-				onClick={onSettingsClick} 
+		<div className={showSettings ? 'multiSelectShort' : 'multiSelect'}>
+			<Select
+				value={value}
+				onChange={onChange}
+				placeholder={placeholder}
+				options={options}
+				isMulti
 			/>
-		)}
+		</div>
+		{showSettings && onSettingsClick && (
+				<img 
+					src={settingsIcon}
+					className="settings"
+					alt="settings"
+					onClick={onSettingsClick} 
+				/>
+			)}
 	</div>)
 }
 

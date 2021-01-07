@@ -5,6 +5,7 @@ import {parseTs} from '../../utils/helpers'
 import archivedIcon from '../../assets/archive.svg'
 import asanaIcon from '../../assets/asana.svg'
 import editIcon from '../../assets/edit.svg'
+import helpIcon from '../../assets/help.svg'
 import {StateIcon} from '../ui/StateIcon'
 import {Tooltip} from '../ui/Tooltip'
 import './Tag.scss'
@@ -19,7 +20,8 @@ class Tag extends Component {
       isLate,
       state,
       portfolios,
-      asanaLink
+      asanaLink,
+      ownerId
     } = this.props.tag
     const {detailedView, users, reports, onOpenTagEdit} = this.props
     return (
@@ -38,7 +40,7 @@ class Tag extends Component {
             <div className="stateIcon">
               <StateIcon state={state} showTooltip />
             </div>
-            <Owners tag={tag} users={users} reports={reports} />
+            <Owner tag={tag} ownerId={ownerId} users={users} reports={reports} />
             <Portfolios portfolios={portfolios || []} />
           </div>}
         </RouterLink>
@@ -52,7 +54,7 @@ class Tag extends Component {
   }
 }
 
-const Owners = ({tag, users, reports}) => {
+const Owner = ({tag, ownerId, users, reports}) => {
   // get counts of messages for each user
   const usersMessagesCount = reports[tag].reduce(
     (acc, report) => ({
@@ -64,13 +66,19 @@ const Owners = ({tag, users, reports}) => {
     Object.entries(usersMessagesCount).sort(
       (([,a],[,b]) => b - a)
     ).map(([userId,]) => userId)
+  const userId = ownerId && users[ownerId] ? ownerId : userIdsSorted.length ? userIdsSorted[0] : ''
 
-  return <div className="owners">
-    {userIdsSorted.map((userId) => 
-      <div className="owner" key={userId} >
+  return <div className="ownerContainer">
+    {userId && (
+      <div className="owner">
         <span data-tip={users[userId].real_name}>
           <img src={users[userId].image_32} srcSet={`${users[userId].image_72} 2x`} alt="User Avatar" />
         </span>
+        {!ownerId && (
+          <span className="message" data-tip="Owner not set. Displaying user with the most reports.">
+            <img src={helpIcon} alt="help" />
+          </span>
+        )}
       </div>
     )}
   </div>

@@ -142,8 +142,8 @@ app.delete('/api/portfolios/:name', authorize, async (req, res) => {
 })
 
 app.post('/api/tags', authorize, async (req, res) => {
-  const {tag, isArchived, asanaLink, portfolios} = req.body
-  res.json(await updateTag(tag, isArchived, asanaLink, portfolios))
+  const {tag, isArchived, asanaLink, ownerId, portfolios} = req.body
+  res.json(await updateTag(tag, isArchived, asanaLink, ownerId, portfolios))
 })
 
 // endpoints

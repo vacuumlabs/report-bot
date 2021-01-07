@@ -35,8 +35,8 @@ class LeftPanel extends Component {
   onSearchChange = (event) => this.setState({ searchString: event.target.value })
   
   onPortfoliosChange = (portfolios) => {
-    this.setState({ portfolios })
-    const searchQuery = portfolios.length > 0 ? `?portfolios=${encodeURI(portfolios.map(p => p.value))}` : ''
+    this.setState({ portfolios: portfolios || [] })
+    const searchQuery = portfolios?.length > 0 ? `?portfolios=${encodeURI(portfolios.map(p => p.value))}` : ''
     this.props.history.push(`${this.props.location.pathname}${searchQuery}`)
   }
 
@@ -52,12 +52,12 @@ class LeftPanel extends Component {
         !tag.isArchived && moment().diff(parseTs(tag.lastTs), 'days') > tag.frequency
     }
     const partitionedTags = _.flatten(_.partition(tags, 'isLate'))
-    const portfoliosValues = portfolios.map((p) => p.value)
+    const portfoliosValues = portfolios?.length ? portfolios.map((p) => p.value) : []
     const lowerCaseSearchString = searchString.trim().toLowerCase()
     const filteredTags = partitionedTags.filter(
       ({tag, portfolios: tagPortfolios, isArchived}) =>
         tag.toLowerCase().includes(lowerCaseSearchString) &&
-        (portfolios.length === 0 || !_.isEmpty(_.intersection(portfoliosValues, tagPortfolios))) &&
+        (portfolios?.length === 0 || !_.isEmpty(_.intersection(portfoliosValues, tagPortfolios))) &&
         (searchString || !isArchived || showArchived)
     )
     return (
@@ -79,7 +79,7 @@ class LeftPanel extends Component {
                 <PortfoliosSelect
                   options={portfolioOptions}
                   value={portfolios}
-                  onChange={this.onPortfoliosChange}
+                  setValue={this.onPortfoliosChange}
                   placeholder="Filter by portfolios..."
                   showSettings
                   onSettingsClick={() => this.setState({isEditPortfoliosOpen: true})}
@@ -103,6 +103,7 @@ class LeftPanel extends Component {
             onClose={() => this.setState({tagEditOpen: ''})}
             isArchived={tag.isArchived}
             asanaLink={tag.asanaLink}
+            users={users}
             portfolioOptions={portfolioOptions}
             loadReports={loadReports}
           />))}
@@ -126,6 +127,7 @@ function QuickSearch({value, onChange}) {
   return (
     <input
       type="text"
+      className="input"
       value={value}
       onChange={onChange}
       placeholder="Search tag..."
