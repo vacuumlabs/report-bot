@@ -79,7 +79,7 @@ class LeftPanel extends Component {
                 <PortfoliosSelect
                   options={portfolioOptions}
                   value={portfolios}
-                  setValue={this.onPortfoliosChange}
+                  onChange={this.onPortfoliosChange}
                   placeholder="Filter by portfolios..."
                   showSettings
                   onSettingsClick={() => this.setState({isEditPortfoliosOpen: true})}

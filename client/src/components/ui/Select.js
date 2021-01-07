@@ -5,7 +5,6 @@ const customStyles = {
 	control: (provided) => ({
 		...provided,
     minHeight: '40px',
-    minHeight: '40px',
 		borderRadius: '4px',
 		border: '1px solid #7991a6',
 		color: '#757575',
