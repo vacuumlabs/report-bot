@@ -6,7 +6,7 @@ export default transenv()(({str, bool, num}) => {
   return {
     logLevel: str('LOG_LEVEL', isDev ? 'debug' : 'error'),
     pgClient: {
-      connectionString: str('DATABASE_URL'),
+      connectionString: `${str('DATABASE_URL')}${isDev ? '' : '?sslmode=no-verify'}`,
       ssl: !isDev,
     },
     slack: {

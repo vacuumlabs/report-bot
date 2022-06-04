@@ -1,5 +1,7 @@
 import transenv from 'transenv'
 
+console.warn('node env:', process.env.NODE_ENV)
+
 export default transenv()(({str, bool, num}) => {
   const isDev = str('NODE_ENV') === 'development'
   const disableAuth = bool('disable_auth', false) && isDev
@@ -16,7 +18,7 @@ export default transenv()(({str, bool, num}) => {
       requiredTeamId: num('required_team_id'),
     }),
     pgClient: {
-      connectionString: str('DATABASE_URL'),
+      connectionString: `${str('DATABASE_URL')}${isDev ? '' : '?sslmode=no-verify'}`,
       ssl: !isDev,
     },
     slack: {
