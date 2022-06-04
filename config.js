@@ -6,7 +6,8 @@ exports.default = transenv()(({str, bool, num}) => {
   return {
     knex: {
       client: 'pg',
-      connection: `${str('DATABASE_URL')}${isDev ? '' : '?ssl=true'}`,
+      connection: `${str('DATABASE_URL')}${isDev ? '' : '?sslmode=no-verify'}`,
+      debug: isDev,
       migrations: {
         directory: 'migrations',
       },
