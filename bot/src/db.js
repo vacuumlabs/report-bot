@@ -19,7 +19,7 @@ export async function upsertReport({
 export async function updateReport({ts, message}) {
   return await db.query(
     'UPDATE "report" SET message = $2 WHERE ts = $1',
-    [ts, message]
+    [ts, message],
   )
 }
 
@@ -32,13 +32,13 @@ export async function isReport(ts) {
     `SELECT COUNT(*)
      FROM report JOIN tagged on report.ts = tagged.report
      WHERE ts=$1`,
-    [ts]
+    [ts],
   )).rows[0].count > 0
 }
 
 export async function getLatestReportsByChannel() {
   return (await db.query(
-    'SELECT channel, MAX(ts) latest FROM report GROUP BY channel'
+    'SELECT channel, MAX(ts) latest FROM report GROUP BY channel',
   )).rows
 }
 
@@ -49,7 +49,7 @@ export async function setTags(ts, tags, isCommand, state) {
      FROM unnest($2::text[]) t
      ON CONFLICT ON CONSTRAINT tag_pkey
      DO NOTHING`,
-    [ts, tags]
+    [ts, tags],
   )
   return await db.query(
     `INSERT INTO "tagged"(report, tag, is_command, state)
@@ -74,7 +74,7 @@ export async function archive(tags, status, ts) {
      ON CONFLICT (tag) DO UPDATE
      SET is_archived=$2, archived_ts=$3
      WHERE tag.archived_ts<$3`,
-    [tags, status, ts]
+    [tags, status, ts],
   )
 }
 
@@ -86,6 +86,6 @@ export async function setFrequency(tagsWithFrequency, ts) {
      ON CONFLICT (tag) DO UPDATE
      SET frequency=excluded.frequency, frequency_ts=$3
      WHERE tag.frequency_ts<$3`,
-    [Object.keys(tagsWithFrequency), Object.values(tagsWithFrequency), ts]
+    [Object.keys(tagsWithFrequency), Object.values(tagsWithFrequency), ts],
   )
 }

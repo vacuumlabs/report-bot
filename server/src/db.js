@@ -13,7 +13,7 @@ export async function loadReports() {
       `SELECT ts, tag, "user", message, channel, response_to
       FROM tagged
       LEFT JOIN report ON tagged.report=report.ts
-      ORDER BY ts ASC`
+      ORDER BY ts ASC`,
     )
   ).rows
 }
@@ -23,7 +23,7 @@ export async function loadReplies() {
     await db.query(
       `SELECT ts, "user", message, channel, response_to
       FROM report
-      ORDER BY ts ASC`
+      ORDER BY ts ASC`,
     )
   ).rows
 }
@@ -64,7 +64,7 @@ export async function loadTags() {
         FROM tag_portfolio 
         group by tag
       ) t4
-      ON (tag.tag = t4.tag)`
+      ON (tag.tag = t4.tag)`,
     )
   ).rows
 }
@@ -75,13 +75,13 @@ export async function updateTag(tag, isArchived, asanaLink, ownerId, portfolios)
     await db.query(
       `UPDATE tag SET is_archived=$1, asana_link=$2, owner_id=$3
        WHERE tag=$4`,
-      [isArchived, asanaLink, ownerId, tag]
+      [isArchived, asanaLink, ownerId, tag],
     )
     await db.query('DELETE FROM tag_portfolio WHERE tag=$1', [tag])
     const values = portfolios.map((p) => [tag, p])
     if (!_.isEmpty(values)) {
       await db.query(
-        format('INSERT INTO tag_portfolio (tag, portfolio) VALUES %L', values)
+        format('INSERT INTO tag_portfolio (tag, portfolio) VALUES %L', values),
       )
     }
     await db.query('COMMIT')
@@ -93,7 +93,7 @@ export async function updateTag(tag, isArchived, asanaLink, ownerId, portfolios)
         LEFT JOIN (SELECT tag, array_agg(portfolio) AS portfolios 
                   FROM tag_portfolio
                   GROUP BY tag) p USING (tag) 
-                  ORDER BY tag ASC`
+                  ORDER BY tag ASC`,
       )
     ).rows
   } catch (e) {
@@ -107,7 +107,7 @@ export async function loadPortfolios() {
     await db.query(
       `SELECT name
       FROM portfolio
-      ORDER BY name ASC`
+      ORDER BY name ASC`,
     )
   ).rows
 }

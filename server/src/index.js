@@ -25,7 +25,7 @@ const web = new WebClient(config.slack.appToken)
 const indexById = (array) => {
   return array.reduce(
     (acc, row) => row ? Object.assign(acc, {[row.id]: row}) : acc,
-    Object.create(null)
+    Object.create(null),
   )
 }
 
@@ -77,13 +77,13 @@ function mentions(message) {
 
 async function loadProfiles(userIds) {
   return indexById(await Promise.all(
-    userIds.map((id) => cache.get(users, id))
+    userIds.map((id) => cache.get(users, id)),
   ))
 }
 
 async function loadChannels(channelIds) {
   return indexById(await Promise.all(
-    channelIds.map((id) => cache.get(channels, id))
+    channelIds.map((id) => cache.get(channels, id)),
   ))
 }
 

@@ -19,7 +19,7 @@ const addThreadMessages = async (channel, thread_ts) => {
         message,
         channel,
         response_to: thread_ts,
-      }))
+      })),
   )
 }
 
@@ -143,7 +143,7 @@ const createOnMessageListener = () => {
 async function syncMessages(channel, oldest = 0) {
   await Promise.all(
     (await loadMessages(channel, oldest))
-      .map(addMessage)
+      .map(addMessage),
   )
   logger.debug(`Channel with ID ${channel} successfully synchronized.`)
 }
@@ -161,7 +161,7 @@ async function loadMessages(channel, oldest) {
     const replies = (await Promise.all(
       loadedMsg
         .filter((m) => m.replies)
-        .map((m) => loadReplies(channel, m.ts))
+        .map((m) => loadReplies(channel, m.ts)),
     )).reduce((acc, val) => acc.concat(val), []) // flat
 
     messages.push(...loadedMsg, ...replies)
@@ -186,7 +186,7 @@ async function catchUpMessages() {
     .reduce((acc, row) => Object.assign(acc, {[row.channel]: row.latest}), {})
 
   const watchedChannels = (await web.users.conversations(
-    {token: botToken, types: 'public_channel,private_channel'}
+    {token: botToken, types: 'public_channel,private_channel'},
   )).channels.map((c) => c.id)
 
   for (const channel of watchedChannels) {
