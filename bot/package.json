@@ -17,7 +17,7 @@
     "@babel/preset-env": "^7.4.5",
     "@slack/rtm-api": "^5.0.1",
     "@slack/web-api": "^5.0.1",
-    "pg": "^7.11.0",
+    "pg": "^8.7.3",
     "transenv": "^1.0.3",
     "winston": "^3.2.1"
   },
