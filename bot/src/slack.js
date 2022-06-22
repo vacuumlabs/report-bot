@@ -120,7 +120,7 @@ const deleteMessage = async (event) => {
 
 const createOnMessageListener = () => {
   const onMessage = async (event) => {
-    logger.debug('Received following message:\n%o', event)
+    logger.info('Received following message:\n%o', event)
 
     const {subtype} = event
 
