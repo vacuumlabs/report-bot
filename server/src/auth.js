@@ -30,11 +30,10 @@ export const authorize = async (req, res, next) => {
       },
     })
 
-    if (!userTeams.some((x) => x.id === c.requiredTeamId) || user.login === c.adminGithub) {
+    if (!userTeams.some((x) => x.id === c.requiredTeamId) && user.login !== c.adminGithub) {
       res.sendStatus(403)
       return
     }
-
   } catch (e) {
     if (e.response.status === 401) {
       res.sendStatus(401)
