@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@slack/bolt": "^3.11.3",
-    "@slack/rtm-api": "^5.0.1",
     "@slack/web-api": "^5.0.1",
     "pg": "^8.7.3",
     "transenv": "^1.0.3",

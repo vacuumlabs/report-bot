@@ -1,13 +1,12 @@
 /* eslint camelcase: 0 */
-import {RTMClient} from '@slack/rtm-api'
+import {App} from '@slack/bolt'
 import {WebClient} from '@slack/web-api'
 import logger from './logger'
 import config from './config'
 import {upsertReport, updateReport, deleteReport, isReport, setTags, clearTags, getLatestReportsByChannel, archive} from './db'
 import {getState, getTags, handleCommands} from './commands'
 
-const {appToken, botToken} = config.slack
-const rtm = new RTMClient(botToken)
+const {appToken, botToken, signingSecret} = config.slack
 const web = new WebClient(appToken)
 
 const addThreadMessages = async (channel, thread_ts) => {
@@ -118,26 +117,25 @@ const deleteMessage = async (event) => {
   await clearTags(ts)
 }
 
-const createOnMessageListener = () => {
-  const onMessage = async (event) => {
-    logger.info('Received following message:\n%o', event)
+/**
+ * @param {import('@slack/bolt').KnownEventFromType<"message">} event
+ */
+const handleMessage = async (event) => {
+  logger.info('Received following message:\n%o', event)
 
-    const {subtype} = event
+  const {subtype} = event
 
-    if (!subtype) {
-      await addMessage(event)
-    } else if (subtype === 'message_changed') {
-      updateMessage(event)
-    } else if (subtype === 'message_deleted') {
-      deleteMessage(event)
-    } else if (subtype.endsWith('_join')) {
-      await syncMessages(event.channel)
-    } else {
-      logger.warn('Unsupported type of message: %s', subtype)
-    }
+  if (!subtype) {
+    await addMessage(event)
+  } else if (subtype === 'message_changed') {
+    updateMessage(event)
+  } else if (subtype === 'message_deleted') {
+    deleteMessage(event)
+  } else if (subtype.endsWith('_join')) {
+    await syncMessages(event.channel)
+  } else {
+    logger.warn('Unsupported type of message: %s', subtype)
   }
-
-  return onMessage
 }
 
 async function syncMessages(channel, oldest = 0) {
@@ -196,12 +194,19 @@ async function catchUpMessages() {
   logger.info('Successfully caught up with unprocessed messages!')
 }
 
-export const connectSlack = async () => {
-  await rtm.start()
-  logger.info('Successfully connected to Slack!')
+// source: https://slack.dev/bolt-js/tutorial/getting-started#setting-up-your-project
+const app = new App({token: botToken, signingSecret})
 
-  // attach listeners
-  rtm.on('message', createOnMessageListener())
+app.error(async (error) => {
+  console.error(error.code, error.message, error.original?.message)
+})
+
+app.event('message', ({event}) => handleMessage(event))
+
+export const connectSlack = async () => {
+  await app.start(process.env.PORT || 3000)
+
+  console.log('⚡️ Bolt app is running!')
 
   await catchUpMessages()
 }
