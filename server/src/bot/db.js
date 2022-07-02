@@ -1,9 +1,5 @@
 /* eslint-disable camelcase */
-import c from '../config'
-import {Client} from 'pg'
-
-export const db = new Client(c.pgClient)
-db.connect()
+import {db} from '../db'
 
 export async function upsertReport({
   ts, user, message, channel, response_to,
