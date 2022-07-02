@@ -11,6 +11,7 @@ export default transenv()(({str, bool, num}) => {
     port: str('PORT', 5000),
     logLevel: str('LOG_LEVEL', isDev ? 'debug' : 'error'),
     disableAuth,
+    adminGithub: str('ADMIN_GITHUB', ''),
     ...(disableAuth ? {} : {
       ssoUrl: str('VL_SSO_URL'),
       ssoKey: str('VL_SSO_KEY'),
