@@ -1,5 +1,9 @@
 # Report Bot
 
+:warning: Recently, I merged the `bot` folder into the `server` folder so we can make use of the @slack/bolt app and Events API instead of RTM.
+Heroku can't direct requests at both dynos, so the `server` will now handle both.
+This means the documentation below is outdated. :warning:
+
 ## 1 Intro
 
 This project consists of three applications contained in the following folders:
@@ -85,10 +89,6 @@ $ yarn
     - "OAuth Access Token" starts with `xoxp` and will be called as `appToken` in our codebase,
     - "Bot User OAuth Access Token" starts with `xoxb` and will be called as `botToken` in our codebase.
     - "Signing secret" will be called as `signingSecret` in our codebase.
-
-  * In the `bot` folder, copy `.env.template` into `.env` and fill missing values.
-
-  * Go into the folder `bot` and run the application:
 
 ```bash
 $ yarn build && yarn start

@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import c from './config'
+import c from '../config'
 import {Client} from 'pg'
 
 export const db = new Client(c.pgClient)

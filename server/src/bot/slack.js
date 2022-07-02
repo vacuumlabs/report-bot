@@ -1,8 +1,7 @@
 /* eslint camelcase: 0 */
-import {App} from '@slack/bolt'
 import {WebClient} from '@slack/web-api'
-import logger from './logger'
-import config from './config'
+import logger from '../logger'
+import config from '../config'
 import {upsertReport, updateReport, deleteReport, isReport, setTags, clearTags, getLatestReportsByChannel, archive} from './db'
 import {getState, getTags, handleCommands} from './commands'
 
@@ -120,7 +119,7 @@ const deleteMessage = async (event) => {
 /**
  * @param {import('@slack/bolt').KnownEventFromType<"message">} event
  */
-const handleMessage = async (event) => {
+export const handleMessage = async (event) => {
   logger.info('Received following message:\n%o', event)
 
   const {subtype} = event
@@ -179,7 +178,7 @@ async function loadReplies(channel, ts) {
   return replies
 }
 
-async function catchUpMessages() {
+export async function catchUpMessages() {
   const latestReportFrom = (await getLatestReportsByChannel())
     .reduce((acc, row) => Object.assign(acc, {[row.channel]: row.latest}), {})
 
@@ -192,21 +191,4 @@ async function catchUpMessages() {
   }
 
   logger.info('Successfully caught up with unprocessed messages!')
-}
-
-// source: https://slack.dev/bolt-js/tutorial/getting-started#setting-up-your-project
-const app = new App({token: botToken, signingSecret})
-
-app.error(async (error) => {
-  console.error(error.code, error.message, error.original?.message)
-})
-
-app.event('message', ({event}) => handleMessage(event))
-
-export const connectSlack = async () => {
-  await app.start(process.env.PORT || 3000)
-
-  console.log('⚡️ Bolt app is running!')
-
-  await catchUpMessages()
 }

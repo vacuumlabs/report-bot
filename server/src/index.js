@@ -19,6 +19,8 @@ import {
 } from './db'
 import {authorize, registerAuthRoutes} from './auth'
 import * as cache from './cache'
+import {boltReceiver} from './bot/bolt'
+import {catchUpMessages} from './bot/slack'
 
 const web = new WebClient(config.slack.appToken)
 
@@ -151,5 +153,20 @@ app.get('*', (req, res, next) => {
   res.sendFile(`${buildDir}/index.html`)
 })
 
-loadReportData()
+app.use('/slack/events', boltReceiver.router)
+
+const init = async () => {
+  try {
+    console.log('Loading report data...')
+    await loadReportData()
+
+    console.log('Catching up on messages...')
+    await catchUpMessages()
+  } catch (error) {
+    logger.error(error)
+  }
+}
+
+init()
+
 app.listen(config.port, () => {logger.info(`Server started on port: ${config.port}`)})

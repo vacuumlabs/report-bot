@@ -1,5 +1,5 @@
-import logger from './logger'
-import config from './config'
+import logger from '../logger'
+import config from '../config'
 import {archive, setFrequency} from './db'
 
 const tagRegexPattern = /:__([a-zA-Z0-9'_+-]+):/g
