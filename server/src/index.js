@@ -3,9 +3,8 @@ import _ from 'lodash'
 import logger from './logger'
 import config from './config'
 
-import express from 'express'
+import express, {urlencoded} from 'express'
 import cookieParser from 'cookie-parser'
-import bodyParser from 'body-parser'
 import path from 'path'
 
 import {
@@ -52,7 +51,6 @@ const emojis = cache.create(() => web.emoji.list())
 const app = express()
 app.set('trust proxy', 'loopback')
 app.use(cookieParser())
-app.use(bodyParser.json())
 
 registerAuthRoutes(app)
 
@@ -60,7 +58,7 @@ registerAuthRoutes(app)
 const buildDir = path.join(`${__dirname}/../../client/build`)
 app.use(express.static(buildDir))
 
-app.get('/api/tags', authorize, async (req, res) => {
+app.get('/api/tags', urlencoded({extended: true}), authorize, async (req, res) => {
   const tags = await loadTags()
   res.json(tags)
 })
@@ -127,29 +125,29 @@ async function loadReportData() {
   }
 }
 
-app.get('/api/reports', authorize, async (req, res) => {
+app.get('/api/reports', urlencoded({extended: true}), authorize, async (req, res) => {
   res.json(await loadReportData())
 })
 
-app.get('/api/portfolios', authorize, async (req, res) => {
+app.get('/api/portfolios', urlencoded({extended: true}), authorize, async (req, res) => {
   res.json(await loadPortfolios())
 })
 
-app.post('/api/portfolios', authorize, async (req, res) => {
+app.post('/api/portfolios', urlencoded({extended: true}), authorize, async (req, res) => {
   res.json(await createPortfolio(req.body.name))
 })
 
-app.delete('/api/portfolios/:name', authorize, async (req, res) => {
+app.delete('/api/portfolios/:name', urlencoded({extended: true}), authorize, async (req, res) => {
   res.json(await deletePortfolio(req.params.name))
 })
 
-app.post('/api/tags', authorize, async (req, res) => {
+app.post('/api/tags', urlencoded({extended: true}), authorize, async (req, res) => {
   const {tag, isArchived, asanaLink, ownerId, portfolios} = req.body
   res.json(await updateTag(tag, isArchived, asanaLink, ownerId, portfolios))
 })
 
 // endpoints
-app.get('*', (req, res, next) => {
+app.get('*', urlencoded({extended: true}), (req, res, next) => {
   res.sendFile(`${buildDir}/index.html`)
 })
 
