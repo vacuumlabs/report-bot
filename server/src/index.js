@@ -155,10 +155,7 @@ app.use('/slack/events', boltReceiver.router)
 
 const init = async () => {
   try {
-    console.log('Loading report data...')
-    await loadReportData()
-
-    console.log('Catching up on messages...')
+    logger.info('Catching up on messages...')
     await catchUpMessages()
   } catch (error) {
     logger.error(error)

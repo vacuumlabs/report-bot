@@ -5,7 +5,7 @@ import config from '../config'
 import {upsertReport, updateReport, deleteReport, isReport, setTags, clearTags, getLatestReportsByChannel, archive} from './db'
 import {getState, getTags, handleCommands} from './commands'
 
-const {appToken, botToken, signingSecret} = config.slack
+const {appToken, botToken} = config.slack
 const web = new WebClient(appToken)
 
 const addThreadMessages = async (channel, thread_ts) => {

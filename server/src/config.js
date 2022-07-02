@@ -1,7 +1,5 @@
 import transenv from 'transenv'
 
-console.warn('node env:', process.env.NODE_ENV)
-
 export default transenv()(({str, bool, num}) => {
   const isDev = str('NODE_ENV') === 'development'
   const disableAuth = bool('disable_auth', false) && isDev
