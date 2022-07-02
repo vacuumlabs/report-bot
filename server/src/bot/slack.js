@@ -1,12 +1,11 @@
 /* eslint camelcase: 0 */
-import {WebClient} from '@slack/web-api'
 import logger from '../logger'
 import config from '../config'
 import {upsertReport, updateReport, deleteReport, isReport, setTags, clearTags, getLatestReportsByChannel, archive} from './db'
 import {getState, getTags, handleCommands} from './commands'
+import {boltApp} from './bolt'
 
-const {appToken, botToken} = config.slack
-const web = new WebClient(appToken)
+const {botToken} = config.slack
 
 const addThreadMessages = async (channel, thread_ts) => {
   await Promise.all(
@@ -22,7 +21,7 @@ const addThreadMessages = async (channel, thread_ts) => {
 }
 
 const addThreadRootMessage = async (channel, ts) => {
-  const channel_history = await web.conversations.history({
+  const channel_history = await boltApp.client.conversations.history({
     channel,
     oldest: ts,
     latest: ts,
@@ -53,7 +52,7 @@ const addMessage = async (event) => {
     await upsertReport(report)
   }
 
-  const isCommand = await handleCommands({message, channel, ts}, web)
+  const isCommand = await handleCommands({message, channel, ts}, boltApp.client)
 
   if (tags.length) {
     await setTags(ts, tags, isCommand, state)
@@ -66,7 +65,7 @@ const addMessage = async (event) => {
 const updateMessage = async (event) => {
   const {message: {text: message, user, ts, thread_ts}, channel, ts: eventTs} = event
 
-  await web.reactions.remove({
+  await boltApp.client.reactions.remove({
     token: botToken,
     channel,
     timestamp: ts,
@@ -102,7 +101,7 @@ const updateMessage = async (event) => {
 
   await clearTags(ts)
 
-  const isCommand = await handleCommands({message, channel, ts, eventTs}, web)
+  const isCommand = await handleCommands({message, channel, ts, eventTs}, boltApp.client)
 
   if (tags.length) {
     await setTags(ts, tags, isCommand, state)
@@ -148,7 +147,9 @@ async function syncMessages(channel, oldest = 0) {
 async function loadMessages(channel, oldest) {
   const messages = []
 
-  for await (const page of web.paginate(
+  console.log('loading messages for ', channel)
+
+  for await (const page of boltApp.client.paginate(
     'conversations.history',
     {channel, oldest, limit: 200},
   )) {
@@ -169,7 +170,7 @@ async function loadMessages(channel, oldest) {
 
 async function loadReplies(channel, ts) {
   const replies = []
-  for await (const page of web.paginate(
+  for await (const page of boltApp.client.paginate(
     'conversations.replies',
     {channel, ts, limit: 200},
   )) replies.push(...page.messages)
@@ -182,11 +183,14 @@ export async function catchUpMessages() {
   const latestReportFrom = (await getLatestReportsByChannel())
     .reduce((acc, row) => Object.assign(acc, {[row.channel]: row.latest}), {})
 
-  const watchedChannels = (await web.users.conversations(
+  const watchedChannels = (await boltApp.client.users.conversations(
     {token: botToken, types: 'public_channel,private_channel'},
-  )).channels.map((c) => c.id)
+  )).channels?.map((c) => c.id || '') || []
+
+  logger.info(`watched channels: ${watchedChannels}`)
 
   for (const channel of watchedChannels) {
+    logger.info(`syncing channel: ${channel}`)
     await syncMessages(channel, latestReportFrom[channel])
   }
 

@@ -1,4 +1,3 @@
-import {WebClient} from '@slack/web-api'
 import _ from 'lodash'
 import logger from './logger'
 import config from './config'
@@ -18,10 +17,8 @@ import {
 } from './db'
 import {authorize, registerAuthRoutes} from './auth'
 import * as cache from './cache'
-import {boltReceiver} from './bot/bolt'
+import {boltApp, boltReceiver} from './bot/bolt'
 import {catchUpMessages} from './bot/slack'
-
-const web = new WebClient(config.slack.appToken)
 
 const indexById = (array) => {
   return array.reduce(
@@ -31,7 +28,7 @@ const indexById = (array) => {
 }
 
 const users = cache.create(async (user) => {
-  const u = await web.users.profile.get({user}).catch((error) => {
+  const u = await boltApp.client.users.profile.get({user}).catch((error) => {
     if (error.data.error !== 'user_not_found') {
       throw error
     }
@@ -39,14 +36,14 @@ const users = cache.create(async (user) => {
   return u ? {...u.profile, id: user} : null
 })
 const channels = cache.create(async (channel) => {
-  const c = await web.conversations.info({channel}).catch((error) => {
+  const c = await boltApp.client.conversations.info({channel}).catch((error) => {
     if (error.data.error !== 'channel_not_found') {
       throw error
     }
   })
   return c ? c.channel : null
 })
-const emojis = cache.create(() => web.emoji.list())
+const emojis = cache.create(() => boltApp.client.emoji.list())
 
 const app = express()
 app.set('trust proxy', 'loopback')

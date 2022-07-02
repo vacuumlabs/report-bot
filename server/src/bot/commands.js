@@ -46,7 +46,7 @@ export function getState(message) {
   return states.length > 0 ? states[0] : null
 }
 
-export async function handleCommands(event, web) {
+export async function handleCommands(event, client) {
   const {botToken} = config.slack
   const {message, channel, ts: messageTs, eventTs = messageTs} = event
   let isCommand = false
@@ -55,7 +55,7 @@ export async function handleCommands(event, web) {
     if (!match) continue
     logger.debug(`executing ${match[0]}`)
     await action(match, message, eventTs)
-    await web.reactions.add({
+    await client.reactions.add({
       token: botToken,
       channel,
       timestamp: messageTs,

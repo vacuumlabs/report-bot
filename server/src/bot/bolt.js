@@ -5,7 +5,7 @@ import logger from '../logger'
 import {handleMessage} from './slack'
 
 export const boltReceiver = new ExpressReceiver({signingSecret: c.slack.signingSecret, endpoints: '/'})
-const boltApp = new App({
+export const boltApp = new App({
   token: c.slack.botToken,
   receiver: boltReceiver,
   extendedErrorHandler: true,
