@@ -159,6 +159,7 @@ const init = async () => {
   }
 }
 
+loadReportData()
 init()
 
 app.listen(config.port, () => {logger.info(`Server started on port: ${config.port}`)})
