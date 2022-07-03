@@ -86,7 +86,6 @@ $ yarn
   * [Create a bot for your workspace](https://get.slack.help/hc/en-us/articles/115005265703-Create-a-bot-for-your-workspace).
 
   * Under the section "OAuth & Permissions" in settings of the application, you can find tokens needed to run *Bot*:
-    - "OAuth Access Token" starts with `xoxp` and will be called as `appToken` in our codebase,
     - "Bot User OAuth Access Token" starts with `xoxb` and will be called as `botToken` in our codebase.
     - "Signing secret" will be called as `signingSecret` in our codebase.
 
