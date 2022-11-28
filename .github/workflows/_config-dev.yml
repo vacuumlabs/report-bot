@@ -1,0 +1,45 @@
+name: CI/CD to development
+
+on:
+  push:
+    tags: [ "*" ]
+
+permissions:
+  pull-requests: read
+  contents: read
+  id-token: write
+
+jobs:
+  test_if_dev:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exit if not on IIT branch
+        if: startsWith(github.ref, 'IIT') == false
+        run: |-
+          exit -1
+
+  build_and_test:
+    uses: ./.github/workflows/test.yml
+
+  build_and_push_docker_image:
+    needs: build_and_test
+    uses: ./.github/workflows/build-docker.yml
+    with:
+      PROJECT_ID_ARTIFACT_REGISTRY: vl-bots-common/vl-reportbot-dev-repository
+      REGION: europe-west1
+      SERVICE: reportbot-dev
+    secrets:
+      WIF_PROVIDER: ${{ secrets.WIF_PROVIDER_DEV }}
+      WIF_SERVICE_ACCOUNT: ${{ secrets.WIF_SERVICE_ACCOUNT_DEV }}
+
+  deploy_to_dev:
+    needs: build_and_push_docker_image
+    uses: ./.github/workflows/deploy-cloudrun.yml
+    with:
+      PROJECT_ID_ARTIFACT_REGISTRY: vl-bots-common/vl-reportbot-dev-repository
+      SERVICE: reportbot-dev
+      PROJECT_ID_CLOUD_RUN: vl-bots-reportbot-dev
+      REGION: europe-west1
+    secrets:
+      WIF_PROVIDER: ${{ secrets.WIF_PROVIDER_DEV }}
+      WIF_SERVICE_ACCOUNT: ${{ secrets.WIF_SERVICE_ACCOUNT_DEV }}

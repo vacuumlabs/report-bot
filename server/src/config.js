@@ -17,7 +17,16 @@ export default transenv()(({str, bool, num}) => {
       requiredTeamId: num('required_team_id'),
     }),
     pgClient: {
-      connectionString: `${str('DATABASE_URL')}${isDev ? '' : '?sslmode=no-verify'}`,
+      connectionString: str('DATABASE_URL', null)
+      ? `${str('DATABASE_URL')}${isDev ? '' : '?sslmode=no-verify'}`
+      : {
+          host: str('DATABASE_HOST'),
+          port: str('DATABASE_PORT'),
+          user: str('DATABASE_USER'),
+          password: str('DATABASE_PASSWORD'),
+          database: str('DATABASE_NAME'),
+          ssl: false,
+        },
       ssl: !isDev,
     },
     slack: {

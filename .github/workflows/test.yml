@@ -1,0 +1,55 @@
+name: Report-bot CI test
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: report_bot
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      
+      - name: Install dependencies
+        run: |-
+          npm i -g yarn
+
+      - name: Copy env templates 
+        run: |-
+          cp .env.template .env && cp server/.env.template server/.env
+
+      - name: Install application dependencies
+        run: |-
+          yarn
+
+      - name: Build application
+        run: |- 
+          yarn build
+
+      - name: Run migrations
+        run: |- 
+          yarn knex migrate:latest
+
+      - name: Run tests
+        run: |- 
+          yarn test
