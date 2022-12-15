@@ -14,7 +14,7 @@
     "@slack/bolt": "^3.11.3",
     "axios": "^0.21.2",
     "cookie-parser": "^1.4.4",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "lodash": "^4.17.21",
     "pg": "^8.7.3",
     "pg-format": "^1.0.4",
